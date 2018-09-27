@@ -273,28 +273,27 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
             CDiskBlockIndex diskindex;
             if (pcursor->GetValue(diskindex)) {
                 // Construct block index object
-                CBlockIndex* pindexNew    = insertBlockIndex(diskindex.GetBlockHash());
-                pindexNew->pprev          = insertBlockIndex(diskindex.hashPrev);
-                pindexNew->nHeight        = diskindex.nHeight;
-                pindexNew->nFile          = diskindex.nFile;
-                pindexNew->nDataPos       = diskindex.nDataPos;
-                pindexNew->nUndoPos       = diskindex.nUndoPos;
-                pindexNew->nVersion       = diskindex.nVersion;
-                pindexNew->hashMerkleRoot = diskindex.hashMerkleRoot;
-                pindexNew->nTime          = diskindex.nTime;
-                pindexNew->nBits          = diskindex.nBits;
-                pindexNew->nNonce				= diskindex.nNonce;
-                pindexNew->nStatus				= diskindex.nStatus;
-                pindexNew->nTx					= diskindex.nTx;
+                CBlockIndex* pindexNew			=	insertBlockIndex(diskindex.GetBlockHash());
+                pindexNew->pprev				=	insertBlockIndex(diskindex.hashPrev);
+                pindexNew->nHeight				=	diskindex.nHeight;
+                pindexNew->nFile				=	diskindex.nFile;
+                pindexNew->nDataPos				=	diskindex.nDataPos;
+                pindexNew->nUndoPos				=	diskindex.nUndoPos;
+                pindexNew->nVersion				=	diskindex.nVersion;
+                pindexNew->hashMerkleRoot		=	diskindex.hashMerkleRoot;
+                pindexNew->nTime				=	diskindex.nTime;
+                pindexNew->nBits				=	diskindex.nBits;
+                pindexNew->nNonce				=	diskindex.nNonce;
+                pindexNew->nStatus				=	diskindex.nStatus;
+                pindexNew->nTx					=	diskindex.nTx;
+				pindexNew->hashSeed_btw			=	diskindex.hashSeed_btw;
+				pindexNew->hashLock_btw			=	diskindex.hashLock_btw;
+				pindexNew->nNonceLock_btw		=	diskindex.nNonceLock_btw;
+				pindexNew->hashLockSeed_btw		=	diskindex.hashLockSeed_btw;
+				pindexNew->hashBlockSeed_btw	=	diskindex.hashBlockSeed_btw;
+				pindexNew->hashBlock_btw		=	diskindex.hashBlock_btw;
 
-				pindexNew->hashSeed_btw        = diskindex.hashSeed_btw;
-				pindexNew->hashLock_btw        = diskindex.hashLock_btw;
-				pindexNew->nNonceLock_btw      = diskindex.nNonceLock_btw;
-				pindexNew->hashLockSeed_btw    = diskindex.hashLockSeed_btw;
-				pindexNew->hashBlockSeed_btw   = diskindex.hashBlockSeed_btw;
-				pindexNew->hashBlock_btw       = diskindex.hashBlock_btw;
-
-                if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits, consensusParams))
+                if (!CheckProofOfWork(pindexNew->nHeight, pindexNew->GetBlockHash(), pindexNew->nBits,  consensusParams))
                     return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
 
                 pcursor->Next();
