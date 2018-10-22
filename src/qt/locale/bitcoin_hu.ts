@@ -2204,6 +2204,10 @@ Kérem a kulcsmondatban használjon &lt;b&gt; tíz vagy több véletlenszerű ka
         <source>&amp;Label:</source>
         <translation>Címke:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Válassz egy korábban már használt címet</translation>

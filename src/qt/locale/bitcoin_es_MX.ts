@@ -553,6 +553,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;Etiqueta</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>This is a normal payment.</source>
         <translation>Este es un pago normal</translation>

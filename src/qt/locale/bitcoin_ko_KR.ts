@@ -2320,6 +2320,10 @@
         <source>&amp;Label:</source>
         <translation>라벨(&amp;L):</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data(&amp;D):</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>이전에 사용한 주소를 선택하십시오</translation>

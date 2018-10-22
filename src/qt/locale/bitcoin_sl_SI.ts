@@ -1455,6 +1455,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;Oznaka:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Izberite enega od že uporabljenih naslovov</translation>

@@ -2300,6 +2300,10 @@
         <source>&amp;Label:</source>
         <translation>标签(&amp;L)：</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>选择以前用过的地址</translation>

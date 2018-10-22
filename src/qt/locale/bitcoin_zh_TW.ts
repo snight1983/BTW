@@ -2315,6 +2315,10 @@
         <source>&amp;Label:</source>
         <translation>標記(&amp;L):</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data(&amp;D):</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>選擇先前使用過的位址</translation>

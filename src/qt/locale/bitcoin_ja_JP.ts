@@ -2155,6 +2155,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;ラベル:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>前回使用したアドレスの選択</translation>

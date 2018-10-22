@@ -1215,6 +1215,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;Oznaka:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Alt+A</source>
         <translation>Alt+A</translation>

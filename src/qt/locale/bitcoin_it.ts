@@ -2312,6 +2312,10 @@ Per specificare più URL separarli con una barra verticale "|".</translation>
         <source>&amp;Label:</source>
         <translation>&amp;Etichetta:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Scegli un indirizzo usato precedentemente</translation>

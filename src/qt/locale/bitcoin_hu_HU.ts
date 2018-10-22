@@ -2175,6 +2175,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;Címke:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Válasszon a korábban használt címek közül</translation>

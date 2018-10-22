@@ -2253,6 +2253,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;وصف :</translation>
     </message>
+     <message>
+        <source>&amp;Data:</source>
+        <translation>&amp;Data:</translation>
+    </message>
     <message>
         <source>Choose previously used address</source>
         <translation>اختر عنوانا مستخدم سابقا</translation>

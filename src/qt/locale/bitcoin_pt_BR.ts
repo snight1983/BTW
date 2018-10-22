@@ -2303,6 +2303,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;Rótulo:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Escolher endereço usado anteriormente</translation>

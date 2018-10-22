@@ -2233,6 +2233,10 @@
         <source>&amp;Label:</source>
         <translation>Rótu&amp;lo:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Escolha o endereço utilizado anteriormente</translation>

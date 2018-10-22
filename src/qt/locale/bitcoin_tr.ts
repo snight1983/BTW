@@ -2271,6 +2271,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;Etiket:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Önceden kullanılmış adres seç</translation>

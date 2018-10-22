@@ -2279,6 +2279,10 @@
         <source>&amp;Label:</source>
         <translation>O&amp;značení:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Vyber již použitou adresu</translation>

@@ -2304,6 +2304,10 @@ Var vänlig och försök igen.</translation>
         <source>&amp;Label:</source>
         <translation>&amp;Etikett:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Välj tidigare använda adresser</translation>

@@ -2319,6 +2319,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;Mærkat:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Vælg tidligere brugt adresse</translation>

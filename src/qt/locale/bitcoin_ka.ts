@@ -1275,6 +1275,10 @@
         <source>&amp;Label:</source>
         <translation>ნიშნუ&amp;ლი:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>აირჩიეთ ადრე გამოყენებული მისამართი</translation>

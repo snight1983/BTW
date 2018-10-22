@@ -1383,6 +1383,10 @@
         <source>&amp;Label:</source>
         <translation>&amp;Märgis</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Choose previously used address</source>
         <translation>Vali eelnevalt kasutatud aadress</translation>

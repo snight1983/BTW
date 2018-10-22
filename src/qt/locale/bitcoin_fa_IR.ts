@@ -889,6 +889,10 @@
         <source>&amp;Label:</source>
         <translation>برچسب:</translation>
     </message>
+  <message>
+    <source>&amp;Data:</source>
+    <translation>&amp;Data:</translation>
+  </message>
     <message>
         <source>Paste address from clipboard</source>
         <translation>استفاده از آدرس کلیپ بورد</translation>
