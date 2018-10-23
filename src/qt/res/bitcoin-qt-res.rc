@@ -19,8 +19,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Bitcoin Wildcard"
-            VALUE "FileDescription",    PACKAGE_NAME " (GUI node for Bitcoin Wildcard)"
+            VALUE "CompanyName",        "Bitcoin VIP"
+            VALUE "FileDescription",    PACKAGE_NAME " (GUI node for Bitcoin VIP)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "bitcoinvip-qt"
             VALUE "LegalCopyright",     COPYRIGHT_STR
