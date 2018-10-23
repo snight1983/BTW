@@ -1,7 +1,7 @@
-Bitcoin Wildcard Core integration/staging tree
+Bitcoin VIP Core integration/staging tree
 =====================================
 
-What is Bitcoin Wildcard?
+What is Bitcoin VIP?
 ----------------
 
 
