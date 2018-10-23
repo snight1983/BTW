@@ -526,7 +526,7 @@ std::string HelpMessage(HelpMessageMode mode)
 std::string LicenseInfo()
 {
     const std::string URL_SOURCE_CODE = "<https://github.com/snight1983/BitcoinVIP>";
-    const std::string URL_WEBSITE = "<https://bitcoinvip.org>";
+    const std::string URL_WEBSITE = "<https://bitcoinvip.info>";
 
     return CopyrightHolders(strprintf(_("Copyright (C) %i-%i"), 2018, COPYRIGHT_YEAR) + " ") + "\n" +
            "\n" +
