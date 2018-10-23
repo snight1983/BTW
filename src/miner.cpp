@@ -124,8 +124,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     LOCK2(cs_main, mempool.cs);
     CBlockIndex* pindexPrev = chainActive.Tip();
     assert(pindexPrev != nullptr);
-    nHeight = pindexPrev->nHeight + 1;
-
+    pblock->nHeight = pindexPrev->nHeight + 1;
+	pblock->nColNum_btcv = pblock->hashPrevBlock.GetUint64(0) % 8192;
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios

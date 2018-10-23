@@ -183,16 +183,13 @@ void RecentRequestsTableModel::addNewRequest(const std::string &recipient)
 {
     std::vector<char> data(recipient.begin(), recipient.end());
     CDataStream ss(data, SER_DISK, CLIENT_VERSION);
-
     RecentRequestEntry entry;
     ss >> entry;
-
     if (entry.id == 0) // should not happen
         return;
 
     if (entry.id > nReceiveRequestsMaxId)
         nReceiveRequestsMaxId = entry.id;
-
     addNewRequest(entry);
 }
 

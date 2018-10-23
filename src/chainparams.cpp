@@ -32,10 +32,10 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
 	genesis.nHeight			= 0;
     genesis.nBits			= nBits;
     genesis.nNonce			= nNonce;
-	genesis.nNonceLock_btw	= nNonceLock,
+	genesis.nNonceLock_btcv	= nNonceLock,
     genesis.nVersion		= nVersion;
-	genesis.hashSeed_btw.SetNull();
-	memcpy( genesis.hashSeed_btw.begin(), "I love you, there is no purpose.", strlen("I love you, there is no purpose."));
+	genesis.hashSeed_btcv.SetNull();
+	memcpy( genesis.hashSeed_btcv.begin(), "I love you, there is no purpose.", strlen("I love you, there is no purpose."));
     genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
 
 

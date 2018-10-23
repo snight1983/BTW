@@ -14,8 +14,8 @@
 #include <version.h>
 
 #include <vector>
-#include <crypto/btw/sph_blake.h>
-#include <crypto/btw/sph_keccak.h>
+#include <crypto/btcv/sph_blake.h>
+#include <crypto/btcv/sph_keccak.h>
 
 typedef uint256 ChainCode;
 
@@ -232,7 +232,7 @@ uint64_t SipHashUint256(uint64_t k0, uint64_t k1, const uint256& val);
 uint64_t SipHashUint256Extra(uint64_t k0, uint64_t k1, const uint256& val, uint32_t extra);
 
 
-void CryptoBTW(void* apOutPut, const void * apInput, int aiLen);
+void Cryptobtcv(void* apOutPut, const void * apInput, int aiLen);
 
-
+void CryptoKeccak(void* apOutPut, const void * apInput, int aiLen);
 #endif // BITCOIN_HASH_H

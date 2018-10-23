@@ -29,14 +29,14 @@ public:
     uint32_t			nBits;
     uint32_t			nNonce;
 
-	mutable uint256     hashSeed_btw;
-	mutable uint256		hashLock_btw;
-	mutable uint32_t	nNonceLock_btw;
-	mutable uint256		hashLockSeed_btw;
-	mutable uint256		hashBlockSeed_btw;
-	mutable uint256		hashBlock_btw;
-	mutable uint32_t	nColNum_btw;
-	
+	mutable uint256     hashSeed_btcv;
+	mutable uint256		hashLock_btcv;
+	mutable uint32_t	nNonceLock_btcv;
+	mutable uint256		hashLockSeed_btcv;
+	mutable uint256		hashBlockSeed_btcv;
+	mutable uint256		hashBlock_btcv;
+	mutable uint32_t	nColNum_btcv;
+	mutable uint32_t	nLockValue;
 	CBlockHeader()
     {
         SetNull();
@@ -53,13 +53,12 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-
-		READWRITE(hashSeed_btw);
-		READWRITE(hashLock_btw);
-		READWRITE(nNonceLock_btw);
-		READWRITE(hashLockSeed_btw);
-		READWRITE(hashBlockSeed_btw);
-		READWRITE(hashBlock_btw);
+		READWRITE(hashSeed_btcv);
+		READWRITE(hashLock_btcv);
+		READWRITE(nNonceLock_btcv);
+		READWRITE(hashLockSeed_btcv);
+		READWRITE(hashBlockSeed_btcv);
+		READWRITE(hashBlock_btcv);
     }
 
     void SetNull()
@@ -72,12 +71,12 @@ public:
         nBits = 0;
         nNonce = 0;
 
-		hashSeed_btw.SetNull();
-		hashLock_btw.SetNull();
-		hashLockSeed_btw.SetNull();
-		hashBlockSeed_btw.SetNull();
-		hashBlock_btw.SetNull();
-		nNonceLock_btw = 0;
+		hashSeed_btcv.SetNull();
+		hashLock_btcv.SetNull();
+		hashLockSeed_btcv.SetNull();
+		hashBlockSeed_btcv.SetNull();
+		hashBlock_btcv.SetNull();
+		nNonceLock_btcv = 0;
     }
 
     bool IsNull() const
@@ -86,12 +85,18 @@ public:
     }
 
     uint256 GetHash( bool abCheck = true ) const;
-	bool    GetHashLock() const;
 	void	FillingSeedByNonce( uint32_t aui32Nonce, 
 								unsigned char* apHashIn, 
 								unsigned char* apHashOut ) const;
 
-	bool	CheckSame( unsigned int* apLeft, unsigned int* apRight, int aiMove )  const;
+	bool	CheckSame(			unsigned char* apLeft, 
+								unsigned char* apRight, 
+								int aiMove )  const;
+
+
+	//////////////// in /////////////////////
+	void InitBlockLock( void ) const;
+
 
     int64_t GetBlockTime() const
     {
@@ -138,19 +143,19 @@ public:
     CBlockHeader GetBlockHeader() const
     {
         CBlockHeader block;
-        block.nVersion       = nVersion;
-		block.nHeight		 = nHeight;
-        block.hashPrevBlock  = hashPrevBlock;
-        block.hashMerkleRoot = hashMerkleRoot;
-        block.nTime          = nTime;
-        block.nBits          = nBits;
-        block.nNonce         = nNonce;
-		block.hashSeed_btw         = hashSeed_btw;
-		block.hashLock_btw         = hashLock_btw;
-		block.hashLockSeed_btw     = hashLockSeed_btw;
-		block.hashBlockSeed_btw    = hashBlockSeed_btw;
-		block.hashBlock_btw        = hashBlock_btw;
-		block.nNonceLock_btw       = nNonceLock_btw;
+        block.nVersion             = nVersion;
+		block.nHeight		       = nHeight;
+        block.hashPrevBlock        = hashPrevBlock;
+        block.hashMerkleRoot       = hashMerkleRoot;
+        block.nTime                = nTime;
+        block.nBits                = nBits;
+        block.nNonce			   = nNonce;
+		block.hashSeed_btcv         = hashSeed_btcv;
+		block.hashLock_btcv         = hashLock_btcv;
+		block.hashLockSeed_btcv     = hashLockSeed_btcv;
+		block.hashBlockSeed_btcv    = hashBlockSeed_btcv;
+		block.hashBlock_btcv        = hashBlock_btcv;
+		block.nNonceLock_btcv       = nNonceLock_btcv;
         return block;
     }
 

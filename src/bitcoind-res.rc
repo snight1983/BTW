@@ -16,14 +16,14 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Bitcoin Wildcard"
-            VALUE "FileDescription",    "btwd (Bitcoin Wildcard node with a JSON-RPC server)"
+            VALUE "CompanyName",        "Bitcoin VIP"
+            VALUE "FileDescription",    "bitcoinvip (Bitcoin VIP node with a JSON-RPC server)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "btwd"
+            VALUE "InternalName",       "bitcoinvip"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "btwd.exe"
-            VALUE "ProductName",        "btwd"
+            VALUE "OriginalFilename",   "bitcoinvip.exe"
+            VALUE "ProductName",        "bitcoinvip"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

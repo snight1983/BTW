@@ -56,9 +56,9 @@ public:
      */
     enum Unit
     {
-        BTW,
-        mBTW,
-        uBTW
+        BTCV,
+        mBTCV,
+        uBTCV
     };
 
     enum SeparatorStyle

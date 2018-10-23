@@ -34,7 +34,6 @@ public:
         READWRITE(id);
         READWRITE(nDate);
         READWRITE(recipient);
-
         if (ser_action.ForRead())
             date = QDateTime::fromTime_t(nDate);
     }

@@ -214,12 +214,12 @@ public:
     uint32_t	nBits;
     uint32_t	nNonce;
 
-	mutable uint256     hashSeed_btw;
-	mutable uint256		hashLock_btw;
-	mutable uint32_t	nNonceLock_btw;
-	mutable uint256		hashLockSeed_btw;
-	mutable uint256		hashBlockSeed_btw;
-	mutable uint256		hashBlock_btw;
+	mutable uint256     hashSeed_btcv;
+	mutable uint256		hashLock_btcv;
+	mutable uint32_t	nNonceLock_btcv;
+	mutable uint256		hashLockSeed_btcv;
+	mutable uint256		hashBlockSeed_btcv;
+	mutable uint256		hashBlock_btcv;
 
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
@@ -252,12 +252,12 @@ public:
         nNonce         = 0;
 
 
-		hashSeed_btw		=	uint256();
-		hashLock_btw		=	uint256();
-		hashLockSeed_btw	=	uint256();
-		hashBlockSeed_btw	=	uint256();
-		hashBlock_btw		=	uint256();
-		nNonceLock_btw		=	0;
+		hashSeed_btcv		=	uint256();
+		hashLock_btcv		=	uint256();
+		hashLockSeed_btcv	=	uint256();
+		hashBlockSeed_btcv	=	uint256();
+		hashBlock_btcv		=	uint256();
+		nNonceLock_btcv		=	0;
     }
 
     CBlockIndex()
@@ -276,12 +276,12 @@ public:
         nBits          = block.nBits;
         nNonce         = block.nNonce;
 
-		hashSeed_btw         =	block.hashSeed_btw;
-		hashLock_btw         =	block.hashLock_btw;
-		nNonceLock_btw       =	block.nNonceLock_btw;
-		hashLockSeed_btw     =	block.hashLockSeed_btw;
-		hashBlockSeed_btw    =	block.hashBlockSeed_btw;
-		hashBlock_btw        =	block.hashBlock_btw;
+		hashSeed_btcv         =	block.hashSeed_btcv;
+		hashLock_btcv         =	block.hashLock_btcv;
+		nNonceLock_btcv       =	block.nNonceLock_btcv;
+		hashLockSeed_btcv     =	block.hashLockSeed_btcv;
+		hashBlockSeed_btcv    =	block.hashBlockSeed_btcv;
+		hashBlock_btcv        =	block.hashBlock_btcv;
     }
 
     CDiskBlockPos GetBlockPos() const {
@@ -314,12 +314,12 @@ public:
         block.nBits          = nBits;
         block.nNonce         = nNonce;
 
-		block.hashSeed_btw         = hashSeed_btw;
-		block.hashLock_btw         = hashLock_btw;
-		block.nNonceLock_btw       = nNonceLock_btw;
-		block.hashLockSeed_btw     = hashLockSeed_btw;
-		block.hashBlockSeed_btw    = hashBlockSeed_btw;
-		block.hashBlock_btw        = hashBlock_btw;
+		block.hashSeed_btcv         = hashSeed_btcv;
+		block.hashLock_btcv         = hashLock_btcv;
+		block.nNonceLock_btcv       = nNonceLock_btcv;
+		block.hashLockSeed_btcv     = hashLockSeed_btcv;
+		block.hashBlockSeed_btcv    = hashBlockSeed_btcv;
+		block.hashBlock_btcv        = hashBlock_btcv;
         return block;
     }
 
@@ -439,12 +439,12 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-		READWRITE(hashSeed_btw);
-		READWRITE(hashLock_btw);
-		READWRITE(nNonceLock_btw);
-		READWRITE(hashLockSeed_btw);
-		READWRITE(hashBlockSeed_btw);
-		READWRITE(hashBlock_btw);
+		READWRITE(hashSeed_btcv);
+		READWRITE(hashLock_btcv);
+		READWRITE(nNonceLock_btcv);
+		READWRITE(hashLockSeed_btcv);
+		READWRITE(hashBlockSeed_btcv);
+		READWRITE(hashBlock_btcv);
     }
 
     uint256 GetBlockHash(bool abCheck = true) const
@@ -458,12 +458,12 @@ public:
         block.nBits					= nBits;
         block.nNonce				= nNonce;
 
-		block.hashSeed_btw          = hashSeed_btw;
-		block.hashLock_btw          = hashLock_btw;
-		block.nNonceLock_btw        = nNonceLock_btw;
-		block.hashLockSeed_btw      = hashLockSeed_btw;
-		block.hashBlockSeed_btw     = hashBlockSeed_btw;
-		block.hashBlock_btw         = hashBlock_btw;
+		block.hashSeed_btcv          = hashSeed_btcv;
+		block.hashLock_btcv          = hashLock_btcv;
+		block.nNonceLock_btcv        = nNonceLock_btcv;
+		block.hashLockSeed_btcv      = hashLockSeed_btcv;
+		block.hashBlockSeed_btcv     = hashBlockSeed_btcv;
+		block.hashBlock_btcv         = hashBlock_btcv;
         return block.GetHash(abCheck);
     }
 

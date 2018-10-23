@@ -108,7 +108,7 @@ void SendCoinsEntry::clear()
     ui->memoTextLabel_s->clear();
     ui->payAmount_s->clear();
 
-    // update the display unit, to not use the default ("BTW")
+    // update the display unit, to not use the default ("BTCV")
     updateDisplayUnit();
 }
 
@@ -177,6 +177,7 @@ SendCoinsRecipient SendCoinsEntry::getValue()
     recipient.label = ui->addAsLabel->text();
     recipient.amount = ui->payAmount->value();
     recipient.message = ui->messageTextLabel->text();
+	recipient.dataopenreturn = ui->addAsData->text();
     recipient.fSubtractFeeFromAmount = (ui->checkboxSubtractFeeFromAmount->checkState() == Qt::Checked);
 
     return recipient;
@@ -203,6 +204,7 @@ void SendCoinsEntry::setValue(const SendCoinsRecipient &value)
         if (recipient.authenticatedMerchant.isEmpty()) // unauthenticated
         {
             ui->payTo_is->setText(recipient.address);
+			ui->addAsData->setText(recipient.dataopenreturn);
             ui->memoTextLabel_is->setText(recipient.message);
             ui->payAmount_is->setValue(recipient.amount);
             ui->payAmount_is->setReadOnly(true);
@@ -212,6 +214,7 @@ void SendCoinsEntry::setValue(const SendCoinsRecipient &value)
         {
             ui->payTo_s->setText(recipient.authenticatedMerchant);
             ui->memoTextLabel_s->setText(recipient.message);
+			ui->addAsData->setText(recipient.dataopenreturn);
             ui->payAmount_s->setValue(recipient.amount);
             ui->payAmount_s->setReadOnly(true);
             setCurrentWidget(ui->SendCoins_AuthenticatedPaymentRequest);
@@ -225,6 +228,8 @@ void SendCoinsEntry::setValue(const SendCoinsRecipient &value)
         ui->messageLabel->setVisible(!recipient.message.isEmpty());
 
         ui->addAsLabel->clear();
+
+		ui->addAsData->setText(recipient.dataopenreturn);
         ui->payTo->setText(recipient.address); // this may set a label from addressbook
         if (!recipient.label.isEmpty()) // if a label had been set from the addressbook, don't overwrite with an empty label
             ui->addAsLabel->setText(recipient.label);
@@ -241,6 +246,11 @@ void SendCoinsEntry::setAddress(const QString &address)
 void SendCoinsEntry::setAmount(const CAmount &amount)
 {
     ui->payAmount->setValue(amount);
+}
+
+void SendCoinsEntry::setData(const QString &data)
+{
+	ui->addAsData->setText(data);
 }
 
 bool SendCoinsEntry::isClear()

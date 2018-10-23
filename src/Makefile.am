@@ -65,11 +65,11 @@ TESTS =
 BENCHMARKS =
 
 if BUILD_BITCOIND
-  bin_PROGRAMS += btwd
+  bin_PROGRAMS += bitcoinvipd
 endif
 
 if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += btw-cli btw-tx
+  bin_PROGRAMS += bitcoinvip-cli bitcoinvip-tx
 endif
 
 .PHONY: FORCE check-symbols check-security
@@ -275,11 +275,11 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sha256.h \
   crypto/sha512.cpp \
   crypto/sha512.h \
-  crypto/btw/sph_types.h \
-  crypto/btw/sph_keccak.h \
-  crypto/btw/sph_keccak.c \
-  crypto/btw/sph_blake.h \
-  crypto/btw/sph_blake.c
+  crypto/btcv/sph_types.h \
+  crypto/btcv/sph_keccak.h \
+  crypto/btcv/sph_keccak.c \
+  crypto/btcv/sph_blake.h \
+  crypto/btcv/sph_blake.c
 
 if USE_ASM
 crypto_libbitcoin_crypto_a_SOURCES += crypto/sha256_sse4.cpp
@@ -383,16 +383,16 @@ nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
 # bitcoind binary #
-btwd_SOURCES = bitcoind.cpp
-btwd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-btwd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-btwd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+bitcoinvipd_SOURCES = bitcoind.cpp
+bitcoinvipd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+bitcoinvipd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+bitcoinvipd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-btwd_SOURCES += bitcoind-res.rc
+bitcoinvipd_SOURCES += bitcoind-res.rc
 endif
 
-btwd_LDADD = \
+bitcoinvipd_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
   $(LIBUNIVALUE) \
@@ -406,38 +406,38 @@ btwd_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-btwd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+bitcoinvipd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
-# btw-cli binary #
-btw_cli_SOURCES = bitcoin-cli.cpp
-btw_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-btw_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-btw_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# bitcoinvip-cli binary #
+bitcoinvip_cli_SOURCES = bitcoin-cli.cpp
+bitcoinvip_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
+bitcoinvip_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+bitcoinvip_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-btw_cli_SOURCES += bitcoin-cli-res.rc
+bitcoinvip_cli_SOURCES += bitcoin-cli-res.rc
 endif
 
-btw_cli_LDADD = \
+bitcoinvip_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO)
 
-btw_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+bitcoinvip_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
-# btw-tx binary #
-btw_tx_SOURCES = bitcoin-tx.cpp
-btw_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-btw_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-btw_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# bitcoinvip-tx binary #
+bitcoinvip_tx_SOURCES = bitcoin-tx.cpp
+bitcoinvip_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+bitcoinvip_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+bitcoinvip_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-btw_tx_SOURCES += bitcoin-tx-res.rc
+bitcoinvip_tx_SOURCES += bitcoin-tx-res.rc
 endif
 
-btw_tx_LDADD = \
+bitcoinvip_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
@@ -445,7 +445,7 @@ btw_tx_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-btw_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+bitcoinvip_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
 # bitcoinconsensus library #

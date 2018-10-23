@@ -82,9 +82,9 @@
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
-const char * const BITCOIN_CONF_FILENAME = "btw.conf";
-const char * const BITCOIN_PID_FILENAME = "btw.pid";
-const char * const DEFAULT_DEBUGLOGFILE = "debugbtw.log";
+const char * const BITCOIN_CONF_FILENAME = "bitcoinvip.conf";
+const char * const BITCOIN_PID_FILENAME = "bitcoinvip.pid";
+const char * const DEFAULT_DEBUGLOGFILE = "debug.log";
 
 ArgsManager gArgs;
 bool fPrintToConsole = false;
@@ -583,7 +583,7 @@ fs::path GetDefaultDataDir()
     // Unix: ~/.bitcoin
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "btw";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "bitcoinvip";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -593,10 +593,10 @@ fs::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    return pathRet / "Library/Application Support/btw";
+    return pathRet / "Library/Application Support/bitcoinvip";
 #else
     // Unix
-    return pathRet / ".btw";
+    return pathRet / ".bitcoinvip";
 #endif
 #endif
 }
@@ -948,8 +948,8 @@ std::string CopyrightHolders(const std::string& strPrefix)
     std::string strCopyrightHolders = strPrefix + strprintf(_(COPYRIGHT_HOLDERS), _(COPYRIGHT_HOLDERS_SUBSTITUTION));
 
     // Check for untranslated substitution to make sure Bitcoin Core copyright is not removed by accident
-    if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("Bitcoin Wildcard Core") == std::string::npos) {
-        strCopyrightHolders += "\n" + strPrefix + "The Bitcoin Wildcard Core developers";
+    if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("Bitcoin VIP Core") == std::string::npos) {
+        strCopyrightHolders += "\n" + strPrefix + "The Bitcoin VIP Core developers";
     }
     return strCopyrightHolders;
 }

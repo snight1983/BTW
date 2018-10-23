@@ -73,8 +73,6 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
 
 bool CheckProofOfWork( int nHeight, uint256 hash, unsigned int nBits, const Consensus::Params& params)
 {
-	if( nHeight == 0 ) return true;
-
     bool fNegative;
     bool fOverflow;
     arith_uint256 bnTarget;
