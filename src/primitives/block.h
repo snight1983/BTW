@@ -36,7 +36,7 @@ public:
 	mutable uint256		hashBlockSeed_btcv;
 	mutable uint256		hashBlock_btcv;
 	mutable uint32_t	nColNum_btcv;
-	mutable uint32_t	nLockValue;
+
 	CBlockHeader()
     {
         SetNull();

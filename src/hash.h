@@ -232,7 +232,7 @@ uint64_t SipHashUint256(uint64_t k0, uint64_t k1, const uint256& val);
 uint64_t SipHashUint256Extra(uint64_t k0, uint64_t k1, const uint256& val, uint32_t extra);
 
 
-void Cryptobtcv(void* apOutPut, const void * apInput, int aiLen);
+void CryptoVIP(void* apOutPut, const void * apInput, int aiLen);
 
 void CryptoKeccak(void* apOutPut, const void * apInput, int aiLen);
 #endif // BITCOIN_HASH_H

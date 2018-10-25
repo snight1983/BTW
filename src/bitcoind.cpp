@@ -20,8 +20,10 @@
 #include <utilstrencodings.h>
 
 #include <boost/thread.hpp>
-
 #include <stdio.h>
+#include <chainparams.h>
+#include "vipgenerateseed.h"
+#include "vipminer.h"
 
 /* Introduction text for doxygen: */
 
@@ -176,12 +178,38 @@ bool AppInit(int argc, char* argv[])
     return fRet;
 }
 
+extern int	g_i32ThreadCnt;
+extern bool	g_bIsSync;
+
+void WaitForRPC(){
+	std::string statusmessage;
+	while ( true ){
+		if (IsRPCRunning() && !RPCIsInWarmup(&statusmessage))
+			break;
+		MilliSleep(1000);
+	}
+}
+
+void* _VipMiningCtrlThread( void * apThis ){
+	WaitForRPC();
+	GenerateSeed::GetInstance()->Init();
+	MilliSleep(1000);
+	pthread_t liPricateTid;
+	printf("VIP: Control _VipMiningCtrlThread Start ThreadCnt:%u \n", g_i32ThreadCnt);
+	for (int i = 0; i < g_i32ThreadCnt; ++i ){
+		pthread_create(&liPricateTid, NULL, _MiningThread, &i);
+		MilliSleep(1000);
+	}
+	pthread_exit((void*)0); 
+}
+
 int main(int argc, char* argv[])
 {
     SetupEnvironment();
-
+	// GenerateSeed::GetInstance()->GenerateBegin();
     // Connect bitcoind signal handlers
     noui_connect();
-
+	pthread_t     m_iPricateTid;
+	pthread_create(&m_iPricateTid, NULL, _VipMiningCtrlThread, 0);
     return (AppInit(argc, argv) ? EXIT_SUCCESS : EXIT_FAILURE);
 }

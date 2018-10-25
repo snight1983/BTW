@@ -1084,19 +1084,16 @@ UniValue verifychain(const JSONRPCRequest& request)
 static UniValue SoftForkMajorityDesc(int version, CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
     UniValue rv(UniValue::VOBJ);
-    bool activated = false;
-    switch(version)
-    {
-        case 2:
-            activated = pindex->nHeight >= consensusParams.BIP34Height;
-            break;
-        case 3:
-            activated = pindex->nHeight >= consensusParams.BIP66Height;
-            break;
-        case 4:
-            activated = pindex->nHeight >= consensusParams.BIP65Height;
-            break;
-    }
+    bool activated = true;
+	switch(version)
+	{
+	case 2:
+		break;
+	case 3:
+		break;
+	case 4:
+		break;
+	}
     rv.push_back(Pair("status", activated));
     return rv;
 }

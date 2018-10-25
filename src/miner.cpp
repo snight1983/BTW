@@ -30,6 +30,7 @@
 #include <memory>
 #include <queue>
 #include <utility>
+#include <utilstrencodings.h>
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -124,8 +125,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     LOCK2(cs_main, mempool.cs);
     CBlockIndex* pindexPrev = chainActive.Tip();
     assert(pindexPrev != nullptr);
-    pblock->nHeight = pindexPrev->nHeight + 1;
-	pblock->nColNum_btcv = pblock->hashPrevBlock.GetUint64(0) % 8192;
+    nHeight = pblock->nHeight = pindexPrev->nHeight + 1;
+	
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
@@ -455,4 +456,25 @@ void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned
 
     pblock->vtx[0] = MakeTransactionRef(std::move(txCoinbase));
     pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
+}
+
+void IncrementExtraNonceEx(CBlock* pblock, unsigned int& nExtraNonceEx)
+{
+	++nExtraNonceEx;
+	CMutableTransaction txCoinbase(*pblock->vtx[0]);
+	txCoinbase.vin[0].scriptSig = (CScript() << pblock->nHeight << CScriptNum(nExtraNonceEx)) + COINBASE_FLAGS;
+	assert(txCoinbase.vin[0].scriptSig.size() <= 100);
+	pblock->vtx[0] = MakeTransactionRef(std::move(txCoinbase));
+	pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
+}
+
+void IncrementExtraNonceFirst(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned int& nExtraNonceEx)
+{
+	++nExtraNonceEx;
+	CMutableTransaction txCoinbase(*pblock->vtx[0]);
+	const char* pszTimestamp = "I love you, there is no purpose. Just love you. YanZi YuXuan. October 20, 2018.";
+	txCoinbase.vin[0].scriptSig = CScript() << pblock->nHeight << CScriptNum(nExtraNonceEx) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+	assert(txCoinbase.vin[0].scriptSig.size() <= 100);
+	pblock->vtx[0] = MakeTransactionRef(std::move(txCoinbase));
+	pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
 }

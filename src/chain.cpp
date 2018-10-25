@@ -17,8 +17,8 @@ void CChain::SetTip(CBlockIndex *pindex) {
     while (pindex && vChain[pindex->nHeight] != pindex) {
         vChain[pindex->nHeight] = pindex;
         pindex = pindex->pprev;
+		}
     }
-}
 
 CBlockLocator CChain::GetLocator(const CBlockIndex *pindex) const {
     int nStep = 1;

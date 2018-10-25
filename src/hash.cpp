@@ -247,7 +247,7 @@ uint64_t SipHashUint256Extra(uint64_t k0, uint64_t k1, const uint256& val, uint3
 }
 
 
-void Cryptobtcv(void* apOutPut, const void * apInput, int aiLen){
+void CryptoVIP(void* apOutPut, const void * apInput, int aiLen){
 	sph_blake256_context     ctx_blake;
 	sph_keccak256_context    ctx_keccak;
 	uint32_t __declspec(align(128)) hashA[8], hashB[8];

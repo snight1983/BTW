@@ -287,9 +287,9 @@ bool CBlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, 
                 pindexNew->nStatus				=	diskindex.nStatus;
                 pindexNew->nTx					=	diskindex.nTx;
 				pindexNew->hashSeed_btcv		=	diskindex.hashSeed_btcv;
-				pindexNew->hashLock_btcv			=	diskindex.hashLock_btcv;
+				pindexNew->hashLock_btcv		=	diskindex.hashLock_btcv;
 				pindexNew->nNonceLock_btcv		=	diskindex.nNonceLock_btcv;
-				pindexNew->hashLockSeed_btcv		=	diskindex.hashLockSeed_btcv;
+				pindexNew->hashLockSeed_btcv	=	diskindex.hashLockSeed_btcv;
 				pindexNew->hashBlockSeed_btcv	=	diskindex.hashBlockSeed_btcv;
 				pindexNew->hashBlock_btcv		=	diskindex.hashBlock_btcv;
 

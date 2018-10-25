@@ -71,10 +71,10 @@ qint64 BitcoinUnits::factor(int unit)
 {
     switch(unit)
     {
-    case BTCV:  return 100000000;
-    case mBTCV: return 100000;
-    case uBTCV: return 100;
-    default:   return 100000000;
+    case BTCV:  return 1000000;
+    case mBTCV: return 1000;
+    case uBTCV: return 1;
+    default:   return 1000000;
     }
 }
 
@@ -82,9 +82,9 @@ int BitcoinUnits::decimals(int unit)
 {
     switch(unit)
     {
-    case BTCV: return 8;
-    case mBTCV: return 5;
-    case uBTCV: return 2;
+    case BTCV: return 6;
+    case mBTCV: return 3;
+    case uBTCV: return 0;
     default: return 0;
     }
 }

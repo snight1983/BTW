@@ -36,15 +36,15 @@ void CBlockHeader::FillingSeedByNonce( uint32_t aui32Nonce, unsigned char* apHas
 	int liNonceLen											=	strlen(lsznNonce);
 	memcpy( lszHashNum + DEF_32_LEN, lsznNonce, liNonceLen );
 	unsigned char lszHashOut[DEF_32_LEN+1]					=	{0};
-	Cryptobtcv(lszHashOut, lszHashNum, DEF_32_LEN + liNonceLen);
+	CryptoVIP(lszHashOut, lszHashNum, DEF_32_LEN + liNonceLen);
 	for( int i = 0; i < DEF_COLUMN_CNT; ++i ){
 		memset( lszHashNum, 0, 43);
 		memcpy( lszHashNum, lszHashOut, DEF_32_LEN );
 		memcpy( lszHashNum + DEF_32_LEN, lsznNonce, liNonceLen );
-		Cryptobtcv(lszHashOut, lszHashNum, DEF_32_LEN + liNonceLen );
+		CryptoVIP(lszHashOut, lszHashNum, DEF_32_LEN + liNonceLen );
 		memcpy( lszOverall+i*DEF_32_LEN, lszHashOut, DEF_32_LEN );
 	}
-	Cryptobtcv(lszHashOut, lszOverall, DEF_OVERALL_SIZE );
+	CryptoVIP(lszHashOut, lszOverall, DEF_OVERALL_SIZE );
 	unsigned int liAry[8] = {0};
 	for( int j = 0; j < 8; ++j ) {
 		memcpy(&liAry[j], lszHashOut+j*4, 4 );
