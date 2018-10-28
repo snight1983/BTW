@@ -107,7 +107,7 @@ void SendCoinsEntry::clear()
     ui->payTo_s->clear();
     ui->memoTextLabel_s->clear();
     ui->payAmount_s->clear();
-
+	ui->addAsData->clear();
     // update the display unit, to not use the default ("BTCV")
     updateDisplayUnit();
 }

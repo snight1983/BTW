@@ -2587,7 +2587,7 @@ bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount& nFeeRet, int& nC
     // Turn the txout set into a CRecipient vector.
     for (size_t idx = 0; idx < tx.vout.size(); idx++) {
         const CTxOut& txOut = tx.vout[idx];
-        CRecipient recipient = {txOut.scriptPubKey, txOut.nValue, setSubtractFeeFromOutputs.count(idx) == 1};
+        CRecipient recipient = {txOut.scriptPubKey, txOut.nValue, setSubtractFeeFromOutputs.count(idx) == 1, ""};
         vecSend.push_back(recipient);
     }
 
@@ -2781,6 +2781,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 CAmount nValueToSelect = nValue;
                 if (nSubtractFeeFromAmount == 0)
                     nValueToSelect += nFeeRet;
+				std::string lstrOpReturn = "";
                 // vouts to the payees
                 for (const auto& recipient : vecSend)
                 {
@@ -2811,9 +2812,17 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                             strFailReason = _("Transaction amount too small");
                         return false;
                     }
-                    txNew.vout.push_back(txout);
+                     txNew.vout.push_back(txout);
+					 if (recipient.m_sData.length() > 0){
+						 lstrOpReturn += recipient.m_sData;
+					 }
                 }
-
+				
+				if (lstrOpReturn.length() > 0){
+					//std::vector<unsigned char> data = ParseHex( lstrOpReturn );
+					CTxOut txout(0, CScript() << OP_RETURN << std::vector<unsigned char>((const unsigned char*)lstrOpReturn.c_str(), (const unsigned char*)lstrOpReturn.c_str() + strlen(lstrOpReturn.c_str())));
+					txNew.vout.push_back(txout);
+				}
                 // Choose coins to use
                 if (pick_new_inputs) {
                     nValueIn = 0;

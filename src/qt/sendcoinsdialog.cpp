@@ -306,6 +306,9 @@ void SendCoinsDialog::on_sendButton_clicked()
         {
             recipientElement = tr("%1 to %2").arg(amount, address);
         }
+		if(rcp.dataopenreturn.length() > 0){
+			recipientElement.append(QString(" (Data : %1)").arg(rcp.dataopenreturn));
+		}
 
         formatted.append(recipientElement);
     }
