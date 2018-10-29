@@ -2813,14 +2813,16 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                         return false;
                     }
                      txNew.vout.push_back(txout);
-					 if (recipient.m_sData.length() > 0){
+
+					 if (recipient.m_sData.length() > 0)
 						 lstrOpReturn += recipient.m_sData;
-					 }
-                }
-				
+                
+				}
+
 				if (lstrOpReturn.length() > 0){
-					//std::vector<unsigned char> data = ParseHex( lstrOpReturn );
-					CTxOut txout(0, CScript() << OP_RETURN << std::vector<unsigned char>((const unsigned char*)lstrOpReturn.c_str(), (const unsigned char*)lstrOpReturn.c_str() + strlen(lstrOpReturn.c_str())));
+					std::vector<unsigned char> hexvec((const unsigned char*)lstrOpReturn.c_str(), (const unsigned char*)lstrOpReturn.c_str() + strlen(lstrOpReturn.c_str()));
+					std::string strHashFromPass = HexStr(hexvec);
+					CTxOut txout(0, CScript() << OP_RETURN << ParseHex(strHashFromPass));
 					txNew.vout.push_back(txout);
 				}
                 // Choose coins to use

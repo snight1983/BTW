@@ -133,10 +133,28 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     txnouttype type;
     std::vector<CTxDestination> addresses;
     int nRequired;
+	std::string lstrAms = ScriptToAsmStr(scriptPubKey);
+    out.pushKV("asm", lstrAms);
+ 	if ( lstrAms.length() > 10) {
+ 		const char* lpData = lstrAms.c_str();
+ 		if ( (lpData[0] == 'O') && (lpData[1] == 'P') && 
+			 (lpData[3] == 'R') && (lpData[4] == 'E') && 
+ 			 (lpData[5] == 'T') && (lpData[6] == 'U') && 
+			 (lpData[7] == 'R') && (lpData[8] == 'N')){
+ 			std::string lstrData = lpData+10;
+ 			if ( lstrData.length() > 0 ) {
+ 				 std::vector<unsigned char> data = ParseHex(lstrData);
+ 				 lstrData = std::string(data.begin(), data.end());
+  				 int liLen = lstrData.length();
+  				 if ( liLen > 0){
+					out.pushKV("data", lstrData);
+				 }
+ 			}
+ 		}
+ 	}
 
-    out.pushKV("asm", ScriptToAsmStr(scriptPubKey));
-    if (fIncludeHex)
-        out.pushKV("hex", HexStr(scriptPubKey.begin(), scriptPubKey.end()));
+	if (fIncludeHex)
+		out.pushKV("hex", HexStr(scriptPubKey.begin(), scriptPubKey.end()));
 
     if (!ExtractDestinations(scriptPubKey, type, addresses, nRequired)) {
         out.pushKV("type", GetTxnOutputType(type));
@@ -173,7 +191,7 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry,
             in.pushKV("vout", (int64_t)txin.prevout.n);
             UniValue o(UniValue::VOBJ);
             o.pushKV("asm", ScriptToAsmStr(txin.scriptSig, true));
-            o.pushKV("hex", HexStr(txin.scriptSig.begin(), txin.scriptSig.end()));
+			o.pushKV("hex", HexStr(txin.scriptSig.begin(), txin.scriptSig.end() ));			
             in.pushKV("scriptSig", o);
             if (!tx.vin[i].scriptWitness.IsNull()) {
                 UniValue txinwitness(UniValue::VARR);
