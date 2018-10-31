@@ -30,6 +30,8 @@
 #include <vector>
 
 #include <atomic>
+#include <spentindex.h>
+#include <addressindex.h>
 
 class CBlockIndex;
 class CBlockTreeDB;
@@ -149,6 +151,13 @@ static const bool DEFAULT_PEERBLOOMFILTERS = true;
 
 /** Default for -stopatheight */
 static const int DEFAULT_STOPATHEIGHT = 0;
+
+
+static const bool DEFAULT_ADDRESSINDEX = false;
+static const bool DEFAULT_TIMESTAMPINDEX = false;
+static const bool DEFAULT_SPENTINDEX = false;
+static const unsigned int DEFAULT_DB_MAX_OPEN_FILES = 1000;
+static const bool DEFAULT_DB_COMPRESSION = true;
 
 struct BlockHasher
 {
@@ -484,5 +493,16 @@ bool DumpMempool();
 
 /** Load the mempool from disk. */
 bool LoadMempool();
+
+
+
+bool GetTimestampIndex(const unsigned int &high, const unsigned int &low, const bool fActiveOnly, std::vector<std::pair<uint256, unsigned int> > &hashes);
+bool GetSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value);
+bool GetAddressIndex(uint160 addressHash, int type,
+	std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex,
+	int start = 0, int end = 0);
+bool GetAddressUnspent(uint160 addressHash, int type,
+	std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs);
+
 
 #endif // BITCOIN_VALIDATION_H

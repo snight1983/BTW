@@ -75,6 +75,8 @@ endif
 .PHONY: FORCE check-symbols check-security
 # bitcoin core #
 BITCOIN_CORE_H = \
+  addressindex.h \
+  spentindex.h \
   addrdb.h \
   addrman.h \
   base58.h \
@@ -215,6 +217,7 @@ libbitcoin_server_a_SOURCES = \
   rpc/rawtransaction.cpp \
   rpc/safemode.cpp \
   rpc/server.cpp \
+  rpc/rpcaddress.cpp \
   script/sigcache.cpp \
   script/ismine.cpp \
   timedata.cpp \
