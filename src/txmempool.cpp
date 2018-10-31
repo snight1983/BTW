@@ -1070,7 +1070,6 @@ SaltedTxidHasher::SaltedTxidHasher() : k0(GetRand(std::numeric_limits<uint64_t>:
 
 void CTxMemPool::addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewCache &view)
 {
-	printf(" CTxMemPool::addAddressIndex \n");
 	LOCK(cs);
 	const CTransaction& tx = entry.GetTx();
 	std::vector<CMempoolAddressDeltaKey> inserted;
@@ -1116,7 +1115,6 @@ void CTxMemPool::addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewC
 bool CTxMemPool::getAddressIndex(std::vector<std::pair<uint160, int> > &addresses,
 	std::vector<std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> > &results)
 {
-	printf(" CTxMemPool::getAddressIndex \n");
 	LOCK(cs);
 	for (std::vector<std::pair<uint160, int> >::iterator it = addresses.begin(); it != addresses.end(); it++) {
 		addressDeltaMap::iterator ait = mapAddress.lower_bound(CMempoolAddressDeltaKey((*it).second, (*it).first));
@@ -1130,7 +1128,6 @@ bool CTxMemPool::getAddressIndex(std::vector<std::pair<uint160, int> > &addresse
 
 bool CTxMemPool::removeAddressIndex(const uint256 txhash)
 {
-	printf(" CTxMemPool::removeAddressIndex \n");
 	LOCK(cs);
 	addressDeltaMapInserted::iterator it = mapAddressInserted.find(txhash);
 	if (it != mapAddressInserted.end()) {
@@ -1146,7 +1143,6 @@ bool CTxMemPool::removeAddressIndex(const uint256 txhash)
 void CTxMemPool::addSpentIndex(const CTxMemPoolEntry &entry, const CCoinsViewCache &view)
 {
 	LOCK(cs);
-	printf(" CTxMemPool::addSpentIndex \n");
 	const CTransaction& tx = entry.GetTx();
 	std::vector<CSpentIndexKey> inserted;
 
@@ -1182,7 +1178,6 @@ void CTxMemPool::addSpentIndex(const CTxMemPoolEntry &entry, const CCoinsViewCac
 bool CTxMemPool::getSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value)
 {
 	LOCK(cs);
-	printf(" CTxMemPool::getSpentIndex \n");
 	mapSpentIndex::iterator it;
 
 	it = mapSpent.find(key);
@@ -1196,7 +1191,6 @@ bool CTxMemPool::getSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value)
 bool CTxMemPool::removeSpentIndex(const uint256 txhash)
 {
 	LOCK(cs);
-	printf(" CTxMemPool::removeSpentIndex \n");
 	mapSpentIndexInserted::iterator it = mapSpentInserted.find(txhash);
 
 	if (it != mapSpentInserted.end()) {
