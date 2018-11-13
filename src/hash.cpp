@@ -246,23 +246,7 @@ uint64_t SipHashUint256Extra(uint64_t k0, uint64_t k1, const uint256& val, uint3
     return v0 ^ v1 ^ v2 ^ v3;
 }
 
-
-void CryptoVIP(void* apOutPut, const void * apInput, int aiLen){
-	sph_blake256_context     ctx_blake;
-	sph_keccak256_context    ctx_keccak;
-	uint32_t  hashA[8], hashB[8];
-
-	sph_blake256_init(&ctx_blake);
-	sph_blake256(&ctx_blake, apInput, aiLen);
-	sph_blake256_close(&ctx_blake, hashA);
-
-	sph_keccak256_init(&ctx_keccak);
-	sph_keccak256(&ctx_keccak, hashA, 32);
-	sph_keccak256_close(&ctx_keccak, hashB);
-	memcpy(apOutPut, hashB, 32);
-}
-
-void CryptoKeccak(void* apOutPut, const void * apInput, int aiLen){
+void Keccak256(void* apOutPut, const void * apInput, int aiLen){
 	sph_keccak256_context ctx_keccak;
 	sph_keccak256_init(&ctx_keccak);
 	sph_keccak256(&ctx_keccak, apInput, aiLen);

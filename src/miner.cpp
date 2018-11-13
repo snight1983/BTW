@@ -157,16 +157,13 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     nLastBlockTx = nBlockTx;
     nLastBlockWeight = nBlockWeight;
 
-    // Create coinbase transaction.
-	// Up to 10 million inflation per year,The money supply doubles every 210 years at the earliest, and the actual cycle will be longer.
-	// 1.Supplementary accidental loss of currency.
-	// 2.Incentive record transactions, a modest increase in miners' income after production cuts.
-	// 3.After about 10 years, the fee income can be greater than the block reward.
+    
 	CAmount nAdditionalFees = nFees;
 	if (nAdditionalFees > 0 ){
-		if ( nAdditionalFees > COIN * 100 ) nAdditionalFees = ( COIN * 100 );
+		if ( nAdditionalFees > COIN * 256 ) nAdditionalFees = ( COIN * 256 );
 	}else nAdditionalFees = 0;
-
+	// The largest annual increase of 27 million, depending on trading activity.
+	// Create coinbase transaction.
     CMutableTransaction coinbaseTx;
     coinbaseTx.vin.resize(1);
     coinbaseTx.vin[0].prevout.SetNull();

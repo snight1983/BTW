@@ -22,8 +22,6 @@
 #include <boost/thread.hpp>
 #include <stdio.h>
 #include <chainparams.h>
-#include "vipgenerateseed.h"
-#include "vipminer.h"
 
 /* Introduction text for doxygen: */
 

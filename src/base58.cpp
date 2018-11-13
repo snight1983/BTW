@@ -215,6 +215,25 @@ int CBase58Data::CompareTo(const CBase58Data& b58) const
 
 namespace
 {
+
+class CBitcoinAddressVisitor : public boost::static_visitor<bool>
+{
+private:
+	CBitcoinAddress* m_pAddress;
+
+public:
+	CBitcoinAddressVisitor(CBitcoinAddress* apAddress) : m_pAddress(apAddress) {}
+
+	bool operator()(const CKeyID& id) const { return m_pAddress->Set(id); }
+	bool operator()(const CScriptID& id) const { return m_pAddress->Set(id); }
+	
+	bool operator()(const WitnessV0KeyHash& no) const { return false; }
+	bool operator()(const WitnessV0ScriptHash& no) const { return false; }
+	bool operator()(const WitnessUnknown& no) const { return false; }
+
+	bool operator()(const CNoDestination& no) const { return false; }
+};
+
 class DestinationEncoder : public boost::static_visitor<std::string>
 {
 private:
@@ -321,6 +340,11 @@ CTxDestination DecodeDestination(const std::string& str, const CChainParams& par
     }
     return CNoDestination();
 }
+
+
+
+
+
 } // namespace
 
 void CBitcoinSecret::SetKey(const CKey& vchSecret)
@@ -376,22 +400,7 @@ bool IsValidDestinationString(const std::string& str)
     return IsValidDestinationString(str, Params());
 }
 
-// namespace
-// {
-// 	class CBitcoinAddressVisitor : public boost::static_visitor<bool>
-// 	{
-// 	private:
-// 		CBitcoinAddress* addr;
-// 
-// 	public:
-// 		CBitcoinAddressVisitor(CBitcoinAddress* addrIn) : addr(addrIn) {}
-// 
-// 		bool operator()(const CKeyID& id) const { return addr->Set(id); }
-// 		bool operator()(const CScriptID& id) const { return addr->Set(id); }
-// 		bool operator()(const CNoDestination& no) const { return false; }
-// 	};
-// 
-// } // anon namespace
+
 
 bool CBitcoinAddress::Set(const CKeyID& id)
 {
@@ -407,8 +416,7 @@ bool CBitcoinAddress::Set(const CScriptID& id)
 
 bool CBitcoinAddress::Set(const CTxDestination& dest)
 {
-	//return boost::apply_visitor(CBitcoinAddressVisitor(this), dest);
-	return false;
+	return boost::apply_visitor(CBitcoinAddressVisitor(this), dest);
 }
 
 bool CBitcoinAddress::IsValid() const

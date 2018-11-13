@@ -19,5 +19,4 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
 
 /** Check whether a block hash satisfies the proof-of-work requirement specified by nBits */
 bool CheckProofOfWork(int nHeight, uint256 hash, unsigned int nBits,  const Consensus::Params&);
-bool CheckProofOfWorkg(int nHeight, uint256 hash, unsigned int nBits);
 #endif // BITCOIN_POW_H

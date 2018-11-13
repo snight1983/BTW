@@ -2096,11 +2096,11 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 					if (fAddressIndex && addressType > 0) {
         // GetTransactionSigOpCost counts 3 types of sigops:
 						addressIndex.push_back(std::make_pair(CAddressIndexKey(addressType, hashBytes, pindex->nHeight, i, txhash, j, true), coin.out.nValue * -1));
-
-						// remove address from unspent index
+        // * legacy (always)
+        // * p2sh (when P2SH enabled in flags and excludes coinbase)
 						addressUnspentIndex.push_back(std::make_pair(CAddressUnspentKey(addressType, hashBytes, input.prevout.hash, input.prevout.n), CAddressUnspentValue()));
 					}
-
+        // * witness (when witness enabled in flags and excludes coinbase)
 					if (fSpentIndex) {
 						// add the spent index to determine the txid and input that spent an output
 						// and to find the amount and address from an input
@@ -2173,7 +2173,7 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 
 	CAmount nAdditionalFees = nFees;
 	if (nAdditionalFees > 0 ){
-		if ( nAdditionalFees > COIN * 100 ) nAdditionalFees = ( COIN * 100 );
+		if ( nAdditionalFees > COIN * 256 ) nAdditionalFees = ( COIN * 256 );
 	}else nAdditionalFees = 0;
 	
     CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus()) + nAdditionalFees;

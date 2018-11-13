@@ -22,33 +22,33 @@ bool CBlockHeader::CheckSame( unsigned char* apLeft, unsigned char* apRight, int
 	return true;
 }
 
-
 void CBlockHeader::InitBlockLock(void) const{
 }
 
 void CBlockHeader::FillingSeedByNonce( uint32_t aui32Nonce, unsigned char* apHashIn, unsigned char* apHashOut) const
 {
 	unsigned char lszOverall[DEF_OVERALL_SIZE+1]			=	{0};
-	unsigned char lszHashNum[ 43]							=	{0};
+
 	memcpy( lszHashNum, apHashIn, DEF_32_LEN );
-	char lsznNonce[11]										=	{0};
 	sprintf( lsznNonce,"%u",  aui32Nonce );
 	int liNonceLen											=	strlen(lsznNonce);
 	memcpy( lszHashNum + DEF_32_LEN, lsznNonce, liNonceLen );
-	unsigned char lszHashOut[DEF_32_LEN+1]					=	{0};
-	CryptoVIP(lszHashOut, lszHashNum, DEF_32_LEN + liNonceLen);
+
+	Keccak256(lszHashOut, lszHashNum, DEF_32_LEN + liNonceLen);
 	for( int i = 0; i < DEF_COLUMN_CNT; ++i ){
 		memset( lszHashNum, 0, 43);
 		memcpy( lszHashNum, lszHashOut, DEF_32_LEN );
 		memcpy( lszHashNum + DEF_32_LEN, lsznNonce, liNonceLen );
-		CryptoVIP(lszHashOut, lszHashNum, DEF_32_LEN + liNonceLen );
+		Keccak256(lszHashOut, lszHashNum, DEF_32_LEN + liNonceLen );
 		memcpy( lszOverall+i*DEF_32_LEN, lszHashOut, DEF_32_LEN );
+		memcpy( lszTail + i, lszHashOut+ i%DEF_32_LEN, 1 );
 	}
-	CryptoVIP(lszHashOut, lszOverall, DEF_OVERALL_SIZE );
-	unsigned int liAry[8] = {0};
-	for( int j = 0; j < 8; ++j ) {
+
+	Keccak256(lszHashOut, lszTail, DEF_COLUMN_CNT );
+	
+	for( int j = 0; j < 8; ++j )
 		memcpy(&liAry[j], lszHashOut+j*4, 4 );
-	}
+	
 	for( int k = 0; k < 8; ++k ){
 		unsigned int liValue;
 		memcpy( &liValue, lszOverall + nColNum_btcv*DEF_32_LEN+k*4, 4 );

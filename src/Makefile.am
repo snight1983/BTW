@@ -59,7 +59,6 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_ZMQ) \
   $(LIBBITCOIN_MINIZ)
   
-
 lib_LTLIBRARIES = $(LIBBITCOINCONSENSUS)
 
 bin_PROGRAMS =
@@ -288,9 +287,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sha512.h \
   crypto/btcv/sph_types.h \
   crypto/btcv/sph_keccak.h \
-  crypto/btcv/sph_keccak.c \
-  crypto/btcv/sph_blake.h \
-  crypto/btcv/sph_blake.c
+  crypto/btcv/sph_keccak.c
 
 if USE_ASM
 crypto_libbitcoin_crypto_a_SOURCES += crypto/sha256_sse4.cpp
@@ -356,8 +353,8 @@ libbitcoin_common_a_SOURCES = \
 
 
 # miniz: shared between libbitcoin_common and libbitcoin_wallet
-libbitcoin_miniz_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-libbitcoin_miniz_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_miniz_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -fPIC
+libbitcoin_miniz_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -fPIC
 libbitcoin_miniz_a_SOURCES = \
   miniz/miniz.c \
   miniz/miniz_tdef.c \
