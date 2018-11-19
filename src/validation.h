@@ -158,6 +158,8 @@ static const bool DEFAULT_TIMESTAMPINDEX = false;
 static const bool DEFAULT_SPENTINDEX = false;
 static const unsigned int DEFAULT_DB_MAX_OPEN_FILES = 1000;
 static const bool DEFAULT_DB_COMPRESSION = true;
+static const bool DEFAULT_SYNC_CHECK = true;
+static const bool DEFAULT_LOAD_CHECK = true;
 
 struct BlockHasher
 {
@@ -192,6 +194,9 @@ extern CAmount maxTxFee;
 /** If the tip is older than this (in seconds), the node is considered to be in initial block download. */
 extern int64_t nMaxTipAge;
 extern bool fEnableReplacement;
+
+extern bool g_fEnableSyncBlockCheck;
+extern bool g_fEnableLoadBlockCheck;
 
 /** Block hash whose ancestors we will assume to have valid scripts without checking them. */
 extern uint256 hashAssumeValid;

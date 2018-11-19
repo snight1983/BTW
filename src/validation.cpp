@@ -245,6 +245,10 @@ CScript COINBASE_FLAGS;
 
 const std::string strMessageMagic = "Bitcoinvip Signed Message:\n";
 
+
+bool g_fEnableSyncBlockCheck = DEFAULT_SYNC_CHECK;
+bool g_fEnableLoadBlockCheck = DEFAULT_LOAD_CHECK;
+
 // Internal stuff
 namespace {
     CBlockIndex *&pindexBestInvalid = g_chainstate.pindexBestInvalid;

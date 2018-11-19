@@ -36,6 +36,7 @@ public:
 	mutable uint256		hashBlockSeed_btcv;
 	mutable uint256		hashBlock_btcv;
 	mutable uint32_t	nColNum_btcv;
+	mutable bool		bIsSeedChecked;
 
 	CBlockHeader()
     {
@@ -77,6 +78,7 @@ public:
 		hashBlockSeed_btcv.SetNull();
 		hashBlock_btcv.SetNull();
 		nNonceLock_btcv = 0;
+		bIsSeedChecked = false;
     }
 
     bool IsNull() const
@@ -156,6 +158,7 @@ public:
 		block.hashBlockSeed_btcv    = hashBlockSeed_btcv;
 		block.hashBlock_btcv        = hashBlock_btcv;
 		block.nNonceLock_btcv       = nNonceLock_btcv;
+		block.nColNum_btcv			= nColNum_btcv;
         return block;
     }
 

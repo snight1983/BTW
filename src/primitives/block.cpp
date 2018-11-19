@@ -59,7 +59,14 @@ void CBlockHeader::FillingSeedByNonce( uint32_t aui32Nonce, unsigned char* apHas
 
 uint256 CBlockHeader::GetHash( bool abCheck ) const{
 	nColNum_btcv = hashPrevBlock.GetUint64(0) % DEF_COLUMN_CNT;
-	
+	if( hashSeed_btcv.IsNull() )			return uint256();
+
+	if ( abCheck && (bIsSeedChecked == false)){
+		hashLockSeed_btcv.SetNull();
+		hashBlockSeed_btcv.SetNull();
+	}
+
+	bIsSeedChecked = true;
 	return hashBlock_btcv;
 }
 

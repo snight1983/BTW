@@ -1127,6 +1127,9 @@ bool AppInitParameterInteraction()
         fEnableReplacement = (std::find(vstrReplacementModes.begin(), vstrReplacementModes.end(), "fee") != vstrReplacementModes.end());
     }
 
+	g_fEnableSyncBlockCheck = gArgs.GetBoolArg("-enablesyncblockcheck", DEFAULT_SYNC_CHECK);
+	g_fEnableLoadBlockCheck = gArgs.GetBoolArg("-enableloadblockcheck", DEFAULT_LOAD_CHECK);
+
     if (gArgs.IsArgSet("-vbparams")) {
         // Allow overriding version bits parameters for testing
         if (!chainparams.MineBlocksOnDemand()) {
@@ -1402,7 +1405,7 @@ bool AppInitMain()
     fReindex = gArgs.GetBoolArg("-reindex", false);
     bool fReindexChainState = gArgs.GetBoolArg("-reindex-chainstate", false);
 
-	// block tree db settings
+    // cache size calculations
 	int dbMaxOpenFiles = gArgs.GetArg("-dbmaxopenfiles", DEFAULT_DB_MAX_OPEN_FILES);
 	bool dbCompression = gArgs.GetBoolArg("-dbcompression", DEFAULT_DB_COMPRESSION);
 
@@ -1420,7 +1423,7 @@ bool AppInitMain()
 	if (gArgs.GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) || gArgs.GetBoolArg("-spentindex", DEFAULT_SPENTINDEX)) {
 		nBlockTreeDBCache = nTotalCache * 3 / 4;
 	} else {
-		nBlockTreeDBCache = std::min(nBlockTreeDBCache, (gArgs.GetBoolArg("-txindex", DEFAULT_TXINDEX) ? nMaxBlockDBAndTxIndexCache : nMaxBlockDBCache) << 20);
+    nBlockTreeDBCache = std::min(nBlockTreeDBCache, (gArgs.GetBoolArg("-txindex", DEFAULT_TXINDEX) ? nMaxBlockDBAndTxIndexCache : nMaxBlockDBCache) << 20);
 	}
 
     nTotalCache -= nBlockTreeDBCache;
