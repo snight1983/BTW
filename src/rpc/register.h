@@ -19,7 +19,7 @@ void RegisterMiscRPCCommands(CRPCTable &tableRPC);
 void RegisterMiningRPCCommands(CRPCTable &tableRPC);
 /** Register raw transaction RPC commands */
 void RegisterRawTransactionRPCCommands(CRPCTable &tableRPC);
-/** Register address index RPC commands */
+/** Register address RPC commands */
 void RegisterAddressRPCCommands(CRPCTable &tableRPC);
 
 

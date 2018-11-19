@@ -42,6 +42,7 @@ UniValue blockToDeltasJSON(const CBlock& block, const CBlockIndex* blockindex)
 	result.push_back(Pair("confirmations", confirmations));
 	result.push_back(Pair("size", (int)::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)));
 	result.push_back(Pair("height", blockindex->nHeight));
+	result.push_back(Pair("nHeight", blockindex->nHeight));
 	//result.push_back(Pair("version", block.nVersion));
 	uint32_t luVer = block.nVersion;
 	result.push_back(Pair("version",(uint64_t)luVer));
@@ -125,6 +126,14 @@ UniValue blockToDeltasJSON(const CBlock& block, const CBlockIndex* blockindex)
 	result.push_back(Pair("mediantime", (int64_t)blockindex->GetMedianTimePast()));
 	result.push_back(Pair("nonce", (uint64_t)block.nNonce));
 	result.push_back(Pair("bits", strprintf("%08x", block.nBits)));
+
+	result.push_back(Pair("hashSeedVip", block.hashSeed_btcv.GetHex()));
+	result.push_back(Pair("hashLockVip", block.hashLock_btcv.GetHex()));
+	result.push_back(Pair("nonceLockVip", (uint64_t)block.nNonceLock_btcv));
+	result.push_back(Pair("hashLockSeedVip", block.hashLockSeed_btcv.GetHex()));
+	result.push_back(Pair("hashBlockSeedVip", block.hashBlockSeed_btcv.GetHex()));
+	result.push_back(Pair("hashBlockVip", block.hashBlock_btcv.GetHex()));
+
 	result.push_back(Pair("difficulty", GetDifficulty(blockindex)));
 	result.push_back(Pair("chainwork", blockindex->nChainWork.GetHex()));
 

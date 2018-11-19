@@ -158,17 +158,26 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     nLastBlockWeight = nBlockWeight;
 
     // Create coinbase transaction.
+	// Up to 10 million inflation per year,The money supply doubles every 210 years at the earliest, and the actual cycle will be longer.
+	// 1.Supplementary accidental loss of currency.
+	// 2.Incentive record transactions, a modest increase in miners' income after production cuts.
+	// 3.After about 10 years, the fee income can be greater than the block reward.
+	CAmount nAdditionalFees = nFees;
+	if (nAdditionalFees > 0 ){
+		if ( nAdditionalFees > COIN * 100 ) nAdditionalFees = ( COIN * 100 );
+	}else nAdditionalFees = 0;
+
     CMutableTransaction coinbaseTx;
     coinbaseTx.vin.resize(1);
     coinbaseTx.vin[0].prevout.SetNull();
     coinbaseTx.vout.resize(1);
     coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
-    coinbaseTx.vout[0].nValue = nFees + GetBlockSubsidy(nHeight, chainparams.GetConsensus());
+    coinbaseTx.vout[0].nValue = nFees + GetBlockSubsidy(nHeight, chainparams.GetConsensus()) + nAdditionalFees;
     coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
     pblock->vtx[0] = MakeTransactionRef(std::move(coinbaseTx));
     pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus());
     pblocktemplate->vTxFees[0] = -nFees;
-
+	
     LogPrintf("CreateNewBlock(): block weight: %u txs: %u fees: %ld sigops %d\n", GetBlockWeight(*pblock), nBlockTx, nFees, nBlockSigOpsCost);
 
     // Fill in header

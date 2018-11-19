@@ -137,10 +137,8 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     out.pushKV("asm", lstrAms);
  	if ( lstrAms.length() > 10) {
  		const char* lpData = lstrAms.c_str();
- 		if ( (lpData[0] == 'O') && (lpData[1] == 'P') && 
-			 (lpData[3] == 'R') && (lpData[4] == 'E') && 
- 			 (lpData[5] == 'T') && (lpData[6] == 'U') && 
-			 (lpData[7] == 'R') && (lpData[8] == 'N')){
+ 		if ( (lpData[0] == 'O') && (lpData[1] == 'P') && (lpData[3] == 'R') && (lpData[4] == 'E') && 
+ 			 (lpData[5] == 'T') && (lpData[6] == 'U') && (lpData[7] == 'R') && (lpData[8] == 'N')){
  			std::string lstrData = lpData+10;
  			if ( lstrData.length() > 0 ) {
  				 std::vector<unsigned char> data = ParseHex(lstrData);

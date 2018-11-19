@@ -975,7 +975,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         // Store transaction in memory
         pool.addUnchecked(hash, entry, setAncestors, validForFeeEstimation);
 
-		// Add memory address index
+        // trim mempool and check if tx was trimmed
 		if (fAddressIndex) {
 			pool.addAddressIndex(entry, view);
 		}
@@ -1592,7 +1592,7 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
 	std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
 	std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
 	std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> > spentIndex;
-
+    // undo transactions in reverse order
     // undo transactions in reverse order
     for (int i = block.vtx.size() - 1; i >= 0; i--) {
         const CTransaction &tx = *(block.vtx[i]);
@@ -1659,9 +1659,9 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
 				if (fSpentIndex) {
 					// undo and delete the spent index
 					spentIndex.push_back(std::make_pair(CSpentIndexKey(input.prevout.hash, input.prevout.n), CSpentIndexValue()));
-				}
+            }
 				if (fAddressIndex) {
-					//const CTxOut &prevout = view.GetOutputFor(tx.vin[j]);
+            // At this point, all of txundo.vprevout should have been moved out.
 					const Coin& coin = view.AccessCoin(tx.vin[j].prevout);
 					
 					if (coin.out.scriptPubKey.IsPayToScriptHash()) {
@@ -1685,11 +1685,11 @@ DisconnectResult CChainState::DisconnectBlock(const CBlock& block, const CBlockI
 
 					} else {
 						continue;
-					}
-				}
-				////
+        }
+    }
+
             }
-            // At this point, all of txundo.vprevout should have been moved out.
+    // move best block pointer to prevout block
         }
     }
 
@@ -2032,13 +2032,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 	std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
 	std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> > spentIndex;
 
-	for (unsigned int i = 0; i < block.vtx.size(); i++)
+    for (unsigned int i = 0; i < block.vtx.size(); i++)
     {
         const CTransaction &tx = *(block.vtx[i]);
-		//
+
 		const uint256 txhash = tx.GetHash();
         //
-		nInputs += tx.vin.size();
+        nInputs += tx.vin.size();
 
         if (!tx.IsCoinBase())
         {
@@ -2087,10 +2087,10 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
 					} else {
 						hashBytes.SetNull();
 						addressType = 0;
-					}
+        }
 
 					if (fAddressIndex && addressType > 0) {
-						// record spending activity
+        // GetTransactionSigOpCost counts 3 types of sigops:
 						addressIndex.push_back(std::make_pair(CAddressIndexKey(addressType, hashBytes, pindex->nHeight, i, txhash, j, true), coin.out.nValue * -1));
 
 						// remove address from unspent index
@@ -2167,7 +2167,12 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * (nTime3 - nTime2), MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nTimeConnect * MILLI / nBlocksTotal);
 
-    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus());
+	CAmount nAdditionalFees = nFees;
+	if (nAdditionalFees > 0 ){
+		if ( nAdditionalFees > COIN * 100 ) nAdditionalFees = ( COIN * 100 );
+	}else nAdditionalFees = 0;
+	
+    CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus()) + nAdditionalFees;
     if (block.vtx[0]->GetValueOut() > blockReward)
         return state.DoS(100,
                          error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",

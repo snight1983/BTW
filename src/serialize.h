@@ -100,6 +100,7 @@ template<typename Stream> inline uint32_t ser_readdata32(Stream &s)
     s.read((char*)&obj, 4);
     return le32toh(obj);
 }
+
 template<typename Stream> inline uint64_t ser_readdata64(Stream &s)
 {
     uint64_t obj;

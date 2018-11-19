@@ -68,8 +68,7 @@ void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fInclud
 
 
 void TxToJSONExpanded(const CTransaction& tx, const uint256 hashBlock, UniValue& entry,
-	int nHeight = 0, int nConfirmations = 0, int nBlockTime = 0)
-{
+	int nHeight = 0, int nConfirmations = 0, int nBlockTime = 0){
 	uint256 txid = tx.GetHash();
 	entry.push_back(Pair("txid", txid.GetHex()));
 	entry.push_back(Pair("hash", tx.GetWitnessHash().GetHex()));
@@ -338,8 +337,8 @@ UniValue getrawtransaction(const JSONRPCRequest& request)
 
     UniValue result(UniValue::VOBJ);
     if (blockindex) result.push_back(Pair("in_active_chain", in_active_chain));
-    //TxToJSON(*tx, hash_block, result);
-	TxToJSONExpanded(*tx, hash_block, result, nHeight, nConfirmations, nBlockTime);
+    TxToJSON(*tx, hash_block, result);
+	//TxToJSONExpanded(*tx, hash_block, result, nHeight, nConfirmations, nBlockTime);
     return result;
 }
 
