@@ -35,7 +35,8 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/thread.hpp>
-
+#include <miniz/miniz.h>
+#include <script/standard.h>
 std::vector<CWalletRef> vpwallets;
 /** Transaction fee set by the user */
 CFeeRate payTxFee(DEFAULT_TRANSACTION_FEE);
@@ -2820,10 +2821,16 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
 				}
 
 				if (lstrOpReturn.length() > 0){
-					std::vector<unsigned char> hexvec((const unsigned char*)lstrOpReturn.c_str(), (const unsigned char*)lstrOpReturn.c_str() + strlen(lstrOpReturn.c_str()));
-					std::string strHashFromPass = HexStr(hexvec);
-					CTxOut txout(0, CScript() << OP_RETURN << ParseHex(strHashFromPass));
-					txNew.vout.push_back(txout);
+					unsigned char lszZip[10000] ={0};
+					unsigned long lulLen = 10000;
+					int liRet = compress2(lszZip, &lulLen, ( const unsigned char *)lstrOpReturn.c_str(), (mz_ulong)strlen(lstrOpReturn.c_str()), MZ_BEST_COMPRESSION);
+					if ((MZ_OK == liRet) && (lulLen < MAX_OP_RETURN_RELAY-3)){
+						std::vector<unsigned char> hexvec(lszZip, lszZip + lulLen);
+						std::string strHashFromPass = HexStr(hexvec);
+						CTxOut txout(0, CScript() << OP_RETURN << ParseHex(strHashFromPass));
+						txNew.vout.push_back(txout);
+					}
+
 				}
                 // Choose coins to use
                 if (pick_new_inputs) {

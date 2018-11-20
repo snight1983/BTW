@@ -31,6 +31,7 @@ LIBBITCOIN_UTIL=libbitcoin_util.a
 LIBBITCOIN_CRYPTO=crypto/libbitcoin_crypto.a
 LIBBITCOINQT=qt/libbitcoinqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
+LIBBITCOIN_MINIZ=libbitcoin_miniz.a
 
 if ENABLE_ZMQ
 LIBBITCOIN_ZMQ=libbitcoin_zmq.a
@@ -55,7 +56,9 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_CLI) \
   $(LIBBITCOIN_WALLET) \
-  $(LIBBITCOIN_ZMQ)
+  $(LIBBITCOIN_ZMQ) \
+  $(LIBBITCOIN_MINIZ)
+  
 
 lib_LTLIBRARIES = $(LIBBITCOINCONSENSUS)
 
@@ -176,7 +179,12 @@ BITCOIN_CORE_H = \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h\
   zmq/zmqnotificationinterface.h \
-  zmq/zmqpublishnotifier.h
+  zmq/zmqpublishnotifier.h \
+  miniz/miniz_common.h \
+  miniz/miniz_tdef.h \
+  miniz/miniz_tinfl.h \
+  miniz/miniz_zip.h \
+  miniz/miniz.h
 
 
 obj/build.h: FORCE
@@ -346,6 +354,17 @@ libbitcoin_common_a_SOURCES = \
   warnings.cpp \
   $(BITCOIN_CORE_H)
 
+
+# miniz: shared between libbitcoin_common and libbitcoin_wallet
+libbitcoin_miniz_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+libbitcoin_miniz_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_miniz_a_SOURCES = \
+  miniz/miniz.c \
+  miniz/miniz_tdef.c \
+  miniz/miniz_tinfl.c \
+  miniz/miniz_zip.c \
+  $(BITCOIN_CORE_H)
+
 # util: shared between all executables.
 # This library *must* be included to make sure that the glibc
 # backward-compatibility objects and their sanity checks are linked.
@@ -401,6 +420,7 @@ bitcoinvipd_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_MINIZ) \ 
   $(LIBBITCOIN_ZMQ) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_CRYPTO) \
@@ -443,6 +463,7 @@ endif
 bitcoinvip_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_MINIZ) \ 
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_CRYPTO) \

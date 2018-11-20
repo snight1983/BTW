@@ -36,6 +36,7 @@ bench_bench_bitcoinvip_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 bench_bench_bitcoinvip_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_MINIZ) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_CRYPTO) \
