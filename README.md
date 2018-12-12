@@ -16,6 +16,16 @@ Development Process
 1. Core core programming has been basically completed.
 2. The browser can already query the status of the block in the browser.see https://explorer.bitvip.org/
 3. Core-based Dapp framework development is currently under intense development.
+4. If you are interested in joining, you can learn through QQ group 361801667
+![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/01.jpg)
+![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/02.jpg)
+![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/03.jpg)
+![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/04.jpg)
+![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/05.jpg)
+![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/06.jpg)
+![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/07.jpg)
+
+
 
 Translations
 ------------
