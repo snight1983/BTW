@@ -24,12 +24,6 @@ Development Process
 ------------------
 ![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/03.jpg)
 ------------------
-![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/05.jpg)
-------------------
-![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/06.jpg)
-------------------
-![Image text](https://github.com/snight1983/BitcoinVIP/blob/master/doc/tmpimg/07.jpg)
-
 
 
 Translations
