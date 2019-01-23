@@ -8,78 +8,28 @@ import (
 
 // 收到网络信息，更新注册信息
 func netMinerRegedit(conn net.UDPAddr, data []byte, posbeg int, datalen int) bool {
-
-	res0, value0 := readInt32(data, posbeg, datalen)
-	posbeg += 4
-	posend := posbeg + int(value0)
-
-	if res0 && (posend <= datalen) && (posend > posbeg) {
-		UserID := string(data[posbeg:posend])
-		posbeg = posend
-		posend = posbeg + 4
-
-		if posend <= datalen {
-			res1, value1 := readInt32(data, posbeg, datalen)
-			posbeg = posend
-			posend = posbeg + int(value1)
-
-			if res1 && (posend <= datalen) && (posend > posbeg) {
-				UserName := string(data[posbeg:posend])
-				posbeg = posend
-				posend = posbeg + 4
-
-				if posend <= datalen {
-					res2, value2 := readInt32(data, posbeg, datalen)
-					posbeg = posend
-					posend += int(value2)
-
-					if res2 && (posend <= datalen) && (posend > posbeg) {
-						UserAddress := string(data[posbeg:posend])
-						posbeg = posend
-						posend = posbeg + 4
-
-						if posend <= datalen {
-							res3, value3 := readInt32(data, posbeg, datalen)
-							posbeg = posend
-							posend += int(value3)
-
-							if res3 && (posend <= datalen) && (posend > posbeg) {
-								UserDisName := string(data[posbeg:posend])
-
-								miner := gMinerRetMap.Get(UserID)
-								tm := time.Now().Unix()
-
-								if miner == nil {
-									m := &Miner{}
-									m.UserID = UserID
-									m.UserName = UserName
-									m.UserAddress = UserAddress
-									m.UserDisName = UserDisName
-									m.Ischange = true
-									m.LastTime = tm
-									m.CreateTime = tm
-									m.Dbid = -1
-									gMinerRetMap.Set(m.UserID, m)
-
-								} else {
-									if tm-miner.(*Miner).LastTime > 5 {
-										if miner.(*Miner).UserName != UserName ||
-											miner.(*Miner).UserAddress != UserAddress ||
-											miner.(*Miner).UserDisName != UserDisName {
-											miner.(*Miner).UserName = UserName
-											miner.(*Miner).UserAddress = UserAddress
-											miner.(*Miner).UserDisName = UserDisName
-											miner.(*Miner).Ischange = true
-											gMinerRetMap.isUpdate = true
-										}
-										miner.(*Miner).LastTime = tm
-									}
-								}
-								return true
-							}
-						}
+	UserID, endpos, res := readString(data, posbeg, datalen)
+	if res {
+		UserName, endpos, res := readString(data, endpos, datalen)
+		if res {
+			RecvAddress, _, res := readString(data, endpos, datalen)
+			if res {
+				miner := gMinerRetMap.Get(UserID)
+				tm := time.Now().Unix()
+				if miner == nil {
+					m := &Miner{-1, UserID, UserName, RecvAddress, tm, true, 0}
+					gMinerRetMap.Set(m.UserID, m)
+					gMinerRetMap.isInsert = true
+				} else {
+					if miner.(*Miner).UserName != UserName ||
+						miner.(*Miner).RecvAddress != RecvAddress {
+						miner.(*Miner).UserName = UserName
+						miner.(*Miner).RecvAddress = RecvAddress
+						miner.(*Miner).Ischange = true
+						gMinerRetMap.isUpdate = true
 					}
 				}
+				return true
 			}
 		}
 	}
@@ -87,51 +37,62 @@ func netMinerRegedit(conn net.UDPAddr, data []byte, posbeg int, datalen int) boo
 }
 
 // 获取用户注册信息
-func getMinerRegedit() (bool, error) {
-	rows, err := gdbconn.Query("SELECT id, usermid, useraddress, username, createtm FROM t_miner_regedit")
-	if err != nil {
-		fmt.Print(err)
-		return false, err
+func getMinerRegedit() error {
+	if nil != gDbconn {
+		rows, err := gDbconn.Query("select id, userid, recvaddress, username, createtm from t_miner_regedit")
+		if err != nil {
+			fmt.Print(err)
+			return err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			m := &Miner{}
+			rows.Scan(&m.Dbid, &m.UserID, &m.RecvAddress, &m.UserName, &m.CreateTime)
+			m.Ischange = false
+			gMinerRetMap.Set(m.UserID, m)
+		}
+		if err = rows.Err(); err != nil {
+			return err
+		}
+		gMinerRetMap.isUpdate = false
+		gMinerRetMap.isInsert = false
+		return err
 	}
-	defer rows.Close()
-	for rows.Next() {
-		m := &Miner{}
-		rows.Scan(&m.Dbid, &m.UserID, &m.UserAddress, &m.UserDisName, &m.CreateTime)
-		m.Ischange = false
-		m.LastTime = 0
-		gMinerRetMap.Set(m.UserID, m)
-	}
-	if err = rows.Err(); err != nil {
-		return false, err
-	}
-	gMinerRetMap.isUpdate = false
-	gMinerRetMap.isInsert = false
-	return true, err
+	return nil
 }
 
 // 更新挖矿注册用户
-func updateMinerRegedit() bool {
-	tx, _ := gdbconn.Begin()
+func updateMinerRegedit() error {
+	tx, err := gDbconn.Begin()
+	if nil != err {
+		fmt.Print(err)
+		return err
+	}
 	gMinerRetMap.lock.Lock()
 	defer gMinerRetMap.lock.Unlock()
 
 	for _, v := range gMinerRetMap.bm {
 		if v.(*Miner).Ischange {
 			if -1 != v.(*Miner).Dbid {
-				stmt, err := tx.Prepare("update t_miner_regedit set usermid=?,useraddress=?,username=?,createtm=? where id=?")
-				if err == nil {
-					_, err := stmt.Exec(v.(*Miner).UserID, v.(*Miner).UserAddress, v.(*Miner).UserDisName, v.(*Miner).CreateTime, v.(*Miner).Dbid)
-					if err == nil {
-						v.(*Miner).Ischange = false
-						//fmt.Printf("info:update new item %d uid:%s \n", Miner.Dbid, Miner.UserID)
+				stmt, err := tx.Prepare("update t_miner_regedit set userid=?,recvaddress=?,username=?,createtm=? where id=?")
+				if err != nil {
+					fmt.Print(err)
+					continue
+				}
+				defer stmt.Close()
+				{
+					_, err := stmt.Exec(v.(*Miner).UserID, v.(*Miner).RecvAddress, v.(*Miner).UserName, v.(*Miner).CreateTime, v.(*Miner).Dbid)
+					if err != nil {
+						fmt.Print(err)
+						continue
 					}
+					v.(*Miner).Ischange = false
 				}
 			}
 		}
 	}
 	tx.Commit()
-
-	return true
+	return err
 }
 
 // 插入挖矿用户注册
@@ -141,24 +102,27 @@ func insertMinerRegedit() bool {
 	for _, v := range gMinerRetMap.bm {
 		if v.(*Miner).Ischange {
 			if -1 == v.(*Miner).Dbid {
-				stmt, err := gdbconn.Prepare("insert t_miner_regedit set usermid=?,useraddress=?,username=?,createtm=?;")
+				stmt, err := gDbconn.Prepare("insert t_miner_regedit set userid=?,recvaddress=?,username=?,createtm=?;")
 				if err != nil {
 					fmt.Print(err)
 					return false
 				}
-				result, err := stmt.Exec(v.(*Miner).UserID, v.(*Miner).UserAddress, v.(*Miner).UserDisName, v.(*Miner).CreateTime)
-				if err != nil {
-					fmt.Print(err)
-					return false
+				defer stmt.Close()
+				{
+					result, err := stmt.Exec(v.(*Miner).UserID, v.(*Miner).RecvAddress, v.(*Miner).UserName, v.(*Miner).CreateTime)
+					if err != nil {
+						fmt.Print(err)
+						return false
+					}
+					{
+						id, err := result.LastInsertId()
+						if err != nil {
+							fmt.Print(err)
+							return false
+						}
+						v.(*Miner).Dbid = id
+					}
 				}
-
-				id, err := result.LastInsertId()
-				if err != nil {
-					fmt.Print(err)
-					return false
-				}
-				v.(*Miner).Dbid = id
-				//fmt.Printf("info:Insert new item %d uid:%s \n", Miner.Dbid, Miner.UserID)
 			}
 		}
 	}

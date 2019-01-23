@@ -2,6 +2,8 @@ package bitcoinvipsvr
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"os"
@@ -73,4 +75,49 @@ func InitConfig(path string) map[string]string {
 		myMap[key] = value
 	}
 	return myMap
+}
+
+func readInt32(buf []byte, begpos int, total int) (bool, int32) {
+	endpos := begpos + 4
+	if endpos <= total {
+		var lvalue32 int32
+		readbuf := bytes.NewReader(buf[begpos : begpos+4])
+		binary.Read(readbuf, binary.LittleEndian, &lvalue32)
+		return true, lvalue32
+	}
+	return false, 0
+}
+
+func readInt64(buf []byte, begpos int, total int) (bool, int64) {
+	endpos := begpos + 8
+	if endpos <= total {
+		var lvalue64 int64
+		readbuf := bytes.NewReader(buf[begpos : begpos+8])
+		binary.Read(readbuf, binary.BigEndian, &lvalue64)
+		return true, lvalue64
+	}
+	return false, 0
+}
+
+func readuint64(buf []byte, begpos int, total int) (bool, uint64) {
+	endpos := begpos + 8
+	if endpos <= total {
+		var lvalue64 uint64
+		readbuf := bytes.NewReader(buf[begpos : begpos+8])
+		binary.Read(readbuf, binary.LittleEndian, &lvalue64)
+		return true, lvalue64
+	}
+	return false, 0
+}
+
+func readString(buf []byte, begpos int, maxpos int) (string, int, bool) {
+	var endpos int
+	endpos = begpos + 4
+	res, strLen := readInt32(buf, begpos, maxpos)
+	endpos += int(strLen)
+	if res && (endpos <= maxpos) {
+		strText := string(buf[begpos+4 : endpos])
+		return strText, endpos, true
+	}
+	return "", 0, false
 }
