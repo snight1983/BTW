@@ -22,8 +22,16 @@ func jobUDPHandle(id int) {
 				break
 			case gMsgMiningWorkRQ:
 				msgMiningWorkRQ(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
+				break
 			case gMsgCheckWorkRQ:
 				msgCheckWorkRQ(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
+				break
+			case gMsgMrkID:
+				msgMrkID(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
+				break
+			case gHeaderMrkID:
+				msgHeaderID(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
+				break
 			default:
 				break
 			}
@@ -76,12 +84,6 @@ func StartSvr() bool {
 			if err2 != nil || nil == retJSON {
 				log.Fatalln(err2)
 			}
-
-			//buf, err3 := json.Marshal(retJSON)
-			//if nil == err3 {
-			//
-			//}
-			//log.Println("returnJson:", retJSON)
 		}
 	}
 

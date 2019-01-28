@@ -10,31 +10,29 @@ const gMsgMiningWorkRQ int32 = 1001
 const gMsgMiningWorkRS int32 = 1002
 const gMsgCheckWorkRQ int32 = 1003
 const gMsgCheckWorkRS int32 = 1004
+const gMsgMrkID int32 = 1005
+const gHeaderMrkID int32 = 1006
 
-// Miner account
-type Miner struct {
-	n64Dbid       int64  // 数据库ID
-	sUserID       string // 机器码
-	sUserName     string // 用户名
-	sRecvAddress  string // 用户收钱地址
-	n64CreateTime int64  // 创建时间
-	bIschange     bool   // 是否发生变化
-}
-
-// 用户注册实例
-var gMinerRetMap *sSyncMap
-
-// AddressPay 地址支付总帐
-type sAddressPay struct {
-	n64Dbid       int64  // 数据库ID
-	sUserAddress  string // 收钱地址
-	n64UnPaid     int64  // 未支付
-	n64Paid       int64  // 已支付
-	n64CreateTime int64  // 创建时间
+type sMiner struct {
+	n64Dbid       int64
+	sUserID       string
+	sUserName     string
+	sRecvAddress  string
+	n64CreateTime int64
 	bIschange     bool
 }
 
-// 用户总帐表
+var gMinerRetMap *sSyncMap
+
+type sAddressPay struct {
+	n64Dbid       int64
+	sUserAddress  string
+	n64UnPaid     int64
+	n64Paid       int64
+	n64CreateTime int64
+	bIschange     bool
+}
+
 type sAddressPayMap struct {
 	plock     *sync.RWMutex
 	mBm       map[string]*sAddressPay
@@ -42,15 +40,13 @@ type sAddressPayMap struct {
 	bIsInsert bool
 }
 
-// 总帐信息Map
 var gAddrPayInfoMap *sSyncMap
 
-// JobUDPData data buf
 type sJobUDPData struct {
-	nLen   int          // 数据长度
-	byData []byte       // 数据
-	pAddr  *net.UDPAddr // 地址
-	pConn  *net.UDPConn // 连接
+	nLen   int
+	byData []byte
+	pAddr  *net.UDPAddr
+	pConn  *net.UDPConn
 }
 
 type sBlockHeader struct {

@@ -16,15 +16,15 @@ func netMinerRegedit(paddr *net.UDPAddr, data []byte, posbeg int, datalen int) b
 				miner := gMinerRetMap.Get(UserID)
 				tm := time.Now().Unix()
 				if miner == nil {
-					m := &Miner{-1, UserID, UserName, RecvAddress, tm, true}
+					m := &sMiner{-1, UserID, UserName, RecvAddress, tm, true}
 					gMinerRetMap.Set(m.sUserID, m)
 					gMinerRetMap.isInsert = true
 				} else {
-					if miner.(*Miner).sUserName != UserName ||
-						miner.(*Miner).sRecvAddress != RecvAddress {
-						miner.(*Miner).sUserName = UserName
-						miner.(*Miner).sRecvAddress = RecvAddress
-						miner.(*Miner).bIschange = true
+					if miner.(*sMiner).sUserName != UserName ||
+						miner.(*sMiner).sRecvAddress != RecvAddress {
+						miner.(*sMiner).sUserName = UserName
+						miner.(*sMiner).sRecvAddress = RecvAddress
+						miner.(*sMiner).bIschange = true
 						gMinerRetMap.isUpdate = true
 					}
 				}
@@ -44,7 +44,7 @@ func getMinerRegedit() error {
 		}
 		defer rows.Close()
 		for rows.Next() {
-			m := &Miner{}
+			m := &sMiner{}
 			rows.Scan(&m.n64Dbid, &m.sUserID, &m.sRecvAddress, &m.sUserName)
 			m.bIschange = false
 			gMinerRetMap.Set(m.sUserID, m)
@@ -69,8 +69,8 @@ func updateMinerRegedit() error {
 	defer gMinerRetMap.lock.Unlock()
 
 	for _, v := range gMinerRetMap.bm {
-		if v.(*Miner).bIschange {
-			if -1 != v.(*Miner).n64Dbid {
+		if v.(*sMiner).bIschange {
+			if -1 != v.(*sMiner).n64Dbid {
 				stmt, err := tx.Prepare("update t_miner_regedit set userid=?,recvaddress=?,username=? where id=?")
 				if err != nil {
 					fmt.Print(err)
@@ -78,12 +78,12 @@ func updateMinerRegedit() error {
 				}
 				defer stmt.Close()
 				{
-					_, err := stmt.Exec(v.(*Miner).sUserID, v.(*Miner).sRecvAddress, v.(*Miner).sUserName, v.(*Miner).n64Dbid)
+					_, err := stmt.Exec(v.(*sMiner).sUserID, v.(*sMiner).sRecvAddress, v.(*sMiner).sUserName, v.(*sMiner).n64Dbid)
 					if err != nil {
 						fmt.Print(err)
 						continue
 					}
-					v.(*Miner).bIschange = false
+					v.(*sMiner).bIschange = false
 				}
 			}
 		}
@@ -96,8 +96,8 @@ func insertMinerRegedit() bool {
 	gMinerRetMap.lock.Lock()
 	defer gMinerRetMap.lock.Unlock()
 	for _, v := range gMinerRetMap.bm {
-		if v.(*Miner).bIschange {
-			if -1 == v.(*Miner).n64Dbid {
+		if v.(*sMiner).bIschange {
+			if -1 == v.(*sMiner).n64Dbid {
 				stmt, err := gDbconn.Prepare("insert t_miner_regedit set userid=?,recvaddress=?,username=?,createtm=?;")
 				if err != nil {
 					fmt.Print(err)
@@ -105,7 +105,7 @@ func insertMinerRegedit() bool {
 				}
 				defer stmt.Close()
 				{
-					result, err := stmt.Exec(v.(*Miner).sUserID, v.(*Miner).sRecvAddress, v.(*Miner).sUserName, v.(*Miner).n64CreateTime)
+					result, err := stmt.Exec(v.(*sMiner).sUserID, v.(*sMiner).sRecvAddress, v.(*sMiner).sUserName, v.(*sMiner).n64CreateTime)
 					if err != nil {
 						fmt.Print(err)
 						return false
@@ -116,7 +116,7 @@ func insertMinerRegedit() bool {
 							fmt.Print(err)
 							return false
 						}
-						v.(*Miner).n64Dbid = id
+						v.(*sMiner).n64Dbid = id
 					}
 				}
 			}

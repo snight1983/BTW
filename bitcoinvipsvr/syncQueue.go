@@ -2,11 +2,9 @@ package bitcoinvipsvr
 
 import "sync"
 
-type iElement interface{}
-
 type syncQueue struct {
 	lock    *sync.RWMutex
-	element []iElement
+	element []interface{}
 }
 
 func newQueue() *syncQueue {
@@ -15,13 +13,13 @@ func newQueue() *syncQueue {
 	}
 }
 
-func (q *syncQueue) Push(e iElement) {
+func (q *syncQueue) Push(e interface{}) {
 	q.lock.RLock()
 	defer q.lock.RUnlock()
 	q.element = append(q.element, e)
 }
 
-func (q *syncQueue) Pop() iElement {
+func (q *syncQueue) Pop() interface{} {
 	if q.IsEmpty() {
 		return nil
 	}

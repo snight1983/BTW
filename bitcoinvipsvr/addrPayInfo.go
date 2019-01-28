@@ -3,7 +3,7 @@ package bitcoinvipsvr
 import "fmt"
 
 func getAddresPayInfo() error {
-	rows, err := gDbconn.Query("SELECT id, recvaddress, unpay, paied FROM t_address_payinfo")
+	rows, err := gDbconn.Query("select id, recvaddress, unpay, paied from t_address_payinfo")
 	if err != nil {
 		fmt.Print(err)
 		return err
@@ -59,8 +59,8 @@ func insertAddressPayInfo() bool {
 	gMinerRetMap.lock.Lock()
 	defer gMinerRetMap.lock.Unlock()
 	for _, v := range gMinerRetMap.bm {
-		if v.(*Miner).bIschange {
-			if -1 == v.(*Miner).n64Dbid {
+		if v.(*sMiner).bIschange {
+			if -1 == v.(*sMiner).n64Dbid {
 				stmt, err := gDbconn.Prepare("insert t_address_payinfo set recvaddress=?,unpay=?,paied=?,createtm=?;")
 				if err != nil {
 					fmt.Print(err)
@@ -77,7 +77,7 @@ func insertAddressPayInfo() bool {
 					fmt.Print(err)
 					continue
 				}
-				v.(*Miner).n64Dbid = id
+				v.(*sMiner).n64Dbid = id
 			}
 		}
 	}
