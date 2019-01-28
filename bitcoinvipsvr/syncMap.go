@@ -16,7 +16,6 @@ func newSyncMap() *sSyncMap {
 	}
 }
 
-//Get from maps return the k's value
 func (m *sSyncMap) Get(k interface{}) interface{} {
 	m.lock.RLock()
 	defer m.lock.RUnlock()

@@ -8,7 +8,6 @@ import (
 var gDbconn *sql.DB
 
 func onInitDbConnectPool() error {
-	//temp , from conf later
 	var err error
 	gDbconn, err = sql.Open("mysql", "vipmpool:vipmpool_123A#$@tcp(10.9.0.122:3306)/vipmpool?charset=utf8")
 	if err != nil {

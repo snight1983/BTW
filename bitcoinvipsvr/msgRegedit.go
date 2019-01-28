@@ -6,8 +6,7 @@ import (
 	"time"
 )
 
-// 收到网络信息，更新注册信息
-func netMinerRegedit(conn net.UDPAddr, data []byte, posbeg int, datalen int) bool {
+func netMinerRegedit(paddr *net.UDPAddr, data []byte, posbeg int, datalen int) bool {
 	UserID, endpos, res := readString(data, posbeg, datalen)
 	if res {
 		UserName, endpos, res := readString(data, endpos, datalen)
@@ -17,15 +16,15 @@ func netMinerRegedit(conn net.UDPAddr, data []byte, posbeg int, datalen int) boo
 				miner := gMinerRetMap.Get(UserID)
 				tm := time.Now().Unix()
 				if miner == nil {
-					m := &Miner{-1, UserID, UserName, RecvAddress, tm, true, 0}
-					gMinerRetMap.Set(m.UserID, m)
+					m := &Miner{-1, UserID, UserName, RecvAddress, tm, true}
+					gMinerRetMap.Set(m.sUserID, m)
 					gMinerRetMap.isInsert = true
 				} else {
-					if miner.(*Miner).UserName != UserName ||
-						miner.(*Miner).RecvAddress != RecvAddress {
-						miner.(*Miner).UserName = UserName
-						miner.(*Miner).RecvAddress = RecvAddress
-						miner.(*Miner).Ischange = true
+					if miner.(*Miner).sUserName != UserName ||
+						miner.(*Miner).sRecvAddress != RecvAddress {
+						miner.(*Miner).sUserName = UserName
+						miner.(*Miner).sRecvAddress = RecvAddress
+						miner.(*Miner).bIschange = true
 						gMinerRetMap.isUpdate = true
 					}
 				}
@@ -36,10 +35,9 @@ func netMinerRegedit(conn net.UDPAddr, data []byte, posbeg int, datalen int) boo
 	return false
 }
 
-// 获取用户注册信息
 func getMinerRegedit() error {
 	if nil != gDbconn {
-		rows, err := gDbconn.Query("select id, userid, recvaddress, username, createtm from t_miner_regedit")
+		rows, err := gDbconn.Query("select id, userid, recvaddress, username from t_miner_regedit")
 		if err != nil {
 			fmt.Print(err)
 			return err
@@ -47,9 +45,9 @@ func getMinerRegedit() error {
 		defer rows.Close()
 		for rows.Next() {
 			m := &Miner{}
-			rows.Scan(&m.Dbid, &m.UserID, &m.RecvAddress, &m.UserName, &m.CreateTime)
-			m.Ischange = false
-			gMinerRetMap.Set(m.UserID, m)
+			rows.Scan(&m.n64Dbid, &m.sUserID, &m.sRecvAddress, &m.sUserName)
+			m.bIschange = false
+			gMinerRetMap.Set(m.sUserID, m)
 		}
 		if err = rows.Err(); err != nil {
 			return err
@@ -61,7 +59,6 @@ func getMinerRegedit() error {
 	return nil
 }
 
-// 更新挖矿注册用户
 func updateMinerRegedit() error {
 	tx, err := gDbconn.Begin()
 	if nil != err {
@@ -72,21 +69,21 @@ func updateMinerRegedit() error {
 	defer gMinerRetMap.lock.Unlock()
 
 	for _, v := range gMinerRetMap.bm {
-		if v.(*Miner).Ischange {
-			if -1 != v.(*Miner).Dbid {
-				stmt, err := tx.Prepare("update t_miner_regedit set userid=?,recvaddress=?,username=?,createtm=? where id=?")
+		if v.(*Miner).bIschange {
+			if -1 != v.(*Miner).n64Dbid {
+				stmt, err := tx.Prepare("update t_miner_regedit set userid=?,recvaddress=?,username=? where id=?")
 				if err != nil {
 					fmt.Print(err)
 					continue
 				}
 				defer stmt.Close()
 				{
-					_, err := stmt.Exec(v.(*Miner).UserID, v.(*Miner).RecvAddress, v.(*Miner).UserName, v.(*Miner).CreateTime, v.(*Miner).Dbid)
+					_, err := stmt.Exec(v.(*Miner).sUserID, v.(*Miner).sRecvAddress, v.(*Miner).sUserName, v.(*Miner).n64Dbid)
 					if err != nil {
 						fmt.Print(err)
 						continue
 					}
-					v.(*Miner).Ischange = false
+					v.(*Miner).bIschange = false
 				}
 			}
 		}
@@ -95,13 +92,12 @@ func updateMinerRegedit() error {
 	return err
 }
 
-// 插入挖矿用户注册
 func insertMinerRegedit() bool {
 	gMinerRetMap.lock.Lock()
 	defer gMinerRetMap.lock.Unlock()
 	for _, v := range gMinerRetMap.bm {
-		if v.(*Miner).Ischange {
-			if -1 == v.(*Miner).Dbid {
+		if v.(*Miner).bIschange {
+			if -1 == v.(*Miner).n64Dbid {
 				stmt, err := gDbconn.Prepare("insert t_miner_regedit set userid=?,recvaddress=?,username=?,createtm=?;")
 				if err != nil {
 					fmt.Print(err)
@@ -109,7 +105,7 @@ func insertMinerRegedit() bool {
 				}
 				defer stmt.Close()
 				{
-					result, err := stmt.Exec(v.(*Miner).UserID, v.(*Miner).RecvAddress, v.(*Miner).UserName, v.(*Miner).CreateTime)
+					result, err := stmt.Exec(v.(*Miner).sUserID, v.(*Miner).sRecvAddress, v.(*Miner).sUserName, v.(*Miner).n64CreateTime)
 					if err != nil {
 						fmt.Print(err)
 						return false
@@ -120,7 +116,7 @@ func insertMinerRegedit() bool {
 							fmt.Print(err)
 							return false
 						}
-						v.(*Miner).Dbid = id
+						v.(*Miner).n64Dbid = id
 					}
 				}
 			}
