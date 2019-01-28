@@ -48,6 +48,8 @@ public:
         EXT_PUBLIC_KEY,
         EXT_SECRET_KEY,
 
+		B_PUBKEY_ADDRESS,
+		B_SCRIPT_ADDRESS,
         MAX_BASE58_TYPES
     };
 

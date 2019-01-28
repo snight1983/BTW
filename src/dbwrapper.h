@@ -217,7 +217,6 @@ public:
      * @param[in] fWipe       If true, remove all existing data.
      * @param[in] obfuscate   If true, store data obfuscated via simple XOR. If false, XOR
      *                        with a zero'd byte array.
-	 * @param[in] maxOpenFiles  The maximum number of open files for the database
      */
     CDBWrapper(const fs::path& path, size_t nCacheSize, bool fMemory = false, bool fWipe = false, bool obfuscate = false,  bool compression = false, int maxOpenFiles = 64);
     ~CDBWrapper();

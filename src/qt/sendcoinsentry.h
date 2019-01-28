@@ -47,7 +47,7 @@ public:
     QWidget *setupTabChain(QWidget *prev);
 
     void setFocus();
-
+	void ShowData(bool abIsShow);
 public Q_SLOTS:
     void clear();
     void checkSubtractFeeFromAmount();
@@ -73,6 +73,8 @@ private:
     const PlatformStyle *platformStyle;
 
     bool updateLabel(const QString &address);
+	bool m_bHaveData;
+
 };
 
 #endif // BITCOIN_QT_SENDCOINSENTRY_H

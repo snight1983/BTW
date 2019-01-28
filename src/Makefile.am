@@ -266,7 +266,7 @@ libbitcoin_wallet_a_SOURCES = \
 
 # crypto primitives library
 crypto_libbitcoin_crypto_a_CPPFLAGS = $(AM_CPPFLAGS)  -fPIC
-crypto_libbitcoin_crypto_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -fPIC
+crypto_libbitcoin_crypto_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)   -fPIC
 crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/aes.cpp \
   crypto/aes.h \
@@ -353,8 +353,8 @@ libbitcoin_common_a_SOURCES = \
 
 
 # miniz: shared between libbitcoin_common and libbitcoin_wallet
-libbitcoin_miniz_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -fPIC
-libbitcoin_miniz_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -fPIC
+libbitcoin_miniz_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)  -fPIC
+libbitcoin_miniz_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)  -fPIC
 libbitcoin_miniz_a_SOURCES = \
   miniz/miniz.c \
   miniz/miniz_tdef.c \
@@ -479,7 +479,7 @@ if GLIBC_BACK_COMPAT
 endif
 
 libbitcoinconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
-libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1)
+libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1) $(BOOST_LIBS)
 libbitcoinconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 libbitcoinconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 

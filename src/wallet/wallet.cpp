@@ -37,6 +37,8 @@
 #include <boost/thread.hpp>
 #include <miniz/miniz.h>
 #include <script/standard.h>
+#include <crypto/aes.h>
+#include <core_io.h>
 std::vector<CWalletRef> vpwallets;
 /** Transaction fee set by the user */
 CFeeRate payTxFee(DEFAULT_TRANSACTION_FEE);
@@ -2820,16 +2822,43 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 
 				}
 
-				if (lstrOpReturn.length() > 0){
-					unsigned char lszZip[10000] ={0};
-					unsigned long lulLen = 10000;
-					int liRet = compress2(lszZip, &lulLen, ( const unsigned char *)lstrOpReturn.c_str(), (mz_ulong)strlen(lstrOpReturn.c_str()), MZ_BEST_COMPRESSION);
-					if ( ( MZ_OK == liRet ) && ( lulLen < (MAX_OP_RETURN_RELAY-3) ) ){
-						std::vector<unsigned char> hexvec(lszZip, lszZip + lulLen);
-						std::string strHashFromPass = HexStr(hexvec);
-						CTxOut txout(0, CScript() << OP_RETURN << ParseHex(strHashFromPass));
-						txNew.vout.push_back(txout);
+				if ( lstrOpReturn.length() > 0 ) {
+					 mz_ulong lulLen = ( mz_ulong )strlen(lstrOpReturn.c_str());
+					 mz_ulong lulZipLen = lulLen*2;
+					 char* lpZip = new char[ lulZipLen ];
+					 memset( lpZip, 0, sizeof(char) * lulZipLen );
+					 int liRet = compress2( ( unsigned char * ) lpZip, &lulZipLen, 
+											( const unsigned char *)lstrOpReturn.c_str(), 
+											( mz_ulong) lulLen, MZ_BEST_COMPRESSION );
+					if ( MZ_OK == liRet ){
+						std::string strHashFromPass = "";
+						int liBlockCnt = 0;
+						if ( g_bAESKeyOpen ){
+							liBlockCnt = lulZipLen/AES_BLOCKSIZE;
+							if ( lulLen % AES_BLOCKSIZE > 0 ) liBlockCnt ++;
+							int liCnt = AES_BLOCKSIZE*liBlockCnt+1;
+							unsigned char* lpCiphertext = new unsigned char[ liCnt ];
+							memset( lpCiphertext, 0, sizeof(unsigned char) * liCnt );
+							AES128Encrypt loAes128( g_szAESKey );
+							for( int i = 0; i < liBlockCnt; ++i ){
+								loAes128.Encrypt( lpCiphertext + ( i * AES_BLOCKSIZE ),  (const unsigned char*)lpZip + ( i * AES_BLOCKSIZE ) );	
+							}
+							std::vector<unsigned char> hexvec( lpCiphertext, lpCiphertext + AES_BLOCKSIZE*liBlockCnt );
+							strHashFromPass = HexStr( hexvec );
+							delete [] lpCiphertext;
+						}
+						else{
+							std::vector<unsigned char> hexvec( lpZip, lpZip + lulZipLen );
+							strHashFromPass = HexStr( hexvec );
+						}					
+						CScript loScript = CScript() << OP_RETURN << ParseHex(strHashFromPass);
+						if ( loScript.size() < MAX_OP_RETURN_RELAY){
+							CTxOut txout(0, loScript);
+							txNew.vout.push_back(txout);
+						}
 					}
+					delete [] lpZip;
+					lpZip = nullptr;
 				}
                 // Choose coins to use
                 if (pick_new_inputs) {

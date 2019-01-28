@@ -152,7 +152,7 @@
     <item row="2" column="0">
        <widget class="QLabel" name="labellData">
          <property name="text">
-           <string>&amp;Data:</string>
+           <string>&amp;SCData：</string>
          </property>
          <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -165,10 +165,11 @@
     <item row="2" column="1">
        <widget class="QLineEdit" name="addAsData">
          <property name="toolTip">
-           <string>Enter  Data </string>
+           <string>Enter Data </string>
          </property>
        </widget>
     </item>
+
     <item row="3" column="0">
      <widget class="QLabel" name="amountLabel">
       <property name="text">

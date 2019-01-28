@@ -5,6 +5,7 @@
 
 #include <amount.h>
 #include <base58.h>
+#include <bech32.h>
 #include <chain.h>
 #include <consensus/validation.h>
 #include <core_io.h>
@@ -75,7 +76,18 @@ UniValue blockToDeltasJSON(const CBlock& block, const CBlockIndex* blockindex)
 						delta.push_back(Pair("address", CBitcoinAddress(CKeyID(spentInfo.addressHash)).ToString()));
 					} else if (spentInfo.addressType == 2)  {
 						delta.push_back(Pair("address", CBitcoinAddress(CScriptID(spentInfo.addressHash)).ToString()));
-					} else {
+					}
+					else if(spentInfo.addressType == 3){
+						std::vector<unsigned char> data = {0};
+						ConvertBits<8, 5, true>(data, spentInfo.addressHash.begin(), spentInfo.addressHash.end());												
+						delta.push_back(Pair("address", bech32::Encode(Params().Bech32HRP(), data)));
+					}
+					else if(spentInfo.addressType == 4){
+						std::vector<unsigned char> data = {0};
+						ConvertBits<8, 5, true>(data, spentInfo.addressHash.begin(), spentInfo.addressHash.end());	
+						delta.push_back(Pair("address", bech32::Encode(Params().Bech32HRP(), data)));
+					}
+					else {
 						continue;
 					}
 					delta.push_back(Pair("satoshis", -1 * spentInfo.satoshis));
@@ -147,11 +159,29 @@ UniValue blockToDeltasJSON(const CBlock& block, const CBlockIndex* blockindex)
 
 bool getAddressFromIndex(const int &type, const uint160 &hash, std::string &address)
 {
-	if (type == 2) {
-		address = CBitcoinAddress(CScriptID(hash)).ToString();
-	} else if (type == 1) {
+	if (type == 1) {
 		address = CBitcoinAddress(CKeyID(hash)).ToString();
-	} else {
+		
+	} else if (type == 2) {
+		address = CBitcoinAddress(CScriptID(hash)).ToString();
+		
+	}  else if (type == 3) {
+		//WitnessV0KeyHash keyid;
+		//std::copy(hash.begin(), hash.end(), keyid.begin());
+		//address = CBitcoinAddress(keyid).ToString();
+		std::vector<unsigned char> data = {0};
+		ConvertBits<8, 5, true>(data, hash.begin(), hash.end());												
+		address =  bech32::Encode(Params().Bech32HRP(), data);
+
+	}  else if (type == 4) {
+		//WitnessV0ScriptHash scriptid;
+		//std::copy(hash.begin(), hash.end(), scriptid.begin());
+		//address = CBitcoinAddress(scriptid).ToString();
+		std::vector<unsigned char> data = {0};
+		ConvertBits<8, 5, true>(data, hash.begin(), hash.end());												
+		address =  bech32::Encode(Params().Bech32HRP(), data);
+	} 
+	else {
 		return false;
 	}
 	return true;
@@ -160,13 +190,19 @@ bool getAddressFromIndex(const int &type, const uint160 &hash, std::string &addr
 bool getAddressesFromParams(const UniValue& params, std::vector<std::pair<uint160, int> > &addresses)
 {
 	if (params[0].isStr()) {
-		CBitcoinAddress address(params[0].get_str());
+
+		CTxDestination dest = DecodeDestination(params[0].get_str());
+		if(!IsValidDestination(dest))
+			throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address a1");
+		
+		CBitcoinAddress address(dest);
 		uint160 hashBytes;
 		int type = 0;
 		if (!address.GetIndexKey(hashBytes, type)) {
-			throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
+			throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address a");
 		}
 		addresses.push_back(std::make_pair(hashBytes, type));
+
 	} else if (params[0].isObject()) {
 
 		UniValue addressValues = find_value(params[0].get_obj(), "addresses");
@@ -178,11 +214,15 @@ bool getAddressesFromParams(const UniValue& params, std::vector<std::pair<uint16
 
 		for (std::vector<UniValue>::iterator it = values.begin(); it != values.end(); ++it) {
 
-			CBitcoinAddress address(it->get_str());
+			CTxDestination dest = DecodeDestination(it->get_str());
+			if(!IsValidDestination(dest))
+				throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address b1");
+
+			CBitcoinAddress address(dest);
 			uint160 hashBytes;
 			int type = 0;
 			if (!address.GetIndexKey(hashBytes, type)) {
-				throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
+				throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address b");
 			}
 			addresses.push_back(std::make_pair(hashBytes, type));
 		}
@@ -620,6 +660,7 @@ UniValue getaddressbalance(const JSONRPCRequest& request)
 		}
 	}
 
+	
 	CAmount balance = 0;
 	CAmount received = 0;
 
@@ -633,6 +674,8 @@ UniValue getaddressbalance(const JSONRPCRequest& request)
 	UniValue result(UniValue::VOBJ);
 	result.push_back(Pair("balance", balance));
 	result.push_back(Pair("received", received));
+	result.push_back(Pair("addressIndexsize", (int)addressIndex.size()));
+
 
 	return result;
 

@@ -307,7 +307,12 @@ void SendCoinsDialog::on_sendButton_clicked()
             recipientElement = tr("%1 to %2").arg(amount, address);
         }
 		if(rcp.dataopenreturn.length() > 0){
-			recipientElement.append(QString(" (Data : %1)").arg(rcp.dataopenreturn));
+			QString loTemp = rcp.dataopenreturn;
+			if (rcp.dataopenreturn.length() > 50){
+				loTemp = loTemp.left(50);
+				loTemp += "...";
+			}
+			recipientElement.append(QString("<br/>(SCData : %1)").arg(loTemp));
 		}
 
         formatted.append(recipientElement);
@@ -858,9 +863,16 @@ void SendCoinsDialog::coinControlUpdateLabels()
     CoinControlDialog::payAmounts.clear();
     CoinControlDialog::fSubtractFeeFromAmount = false;
 
+	bool lbHaveShow = false;
     for(int i = 0; i < ui->entries->count(); ++i)
     {
         SendCoinsEntry *entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
+		if ( lbHaveShow == false ) {
+			 entry->ShowData( true );
+			 lbHaveShow = true;
+		}
+		else entry->ShowData(false);
+
         if(entry && !entry->isHidden())
         {
             SendCoinsRecipient rcp = entry->getValue();

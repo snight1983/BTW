@@ -531,7 +531,7 @@ std::string HelpMessage(HelpMessageMode mode)
 std::string LicenseInfo()
 {
     const std::string URL_SOURCE_CODE = "<https://github.com/snight1983/BitcoinVIP>";
-    const std::string URL_WEBSITE = "<https://bitcoinvip.info>";
+    const std::string URL_WEBSITE = "<https://www.bitvip.org/>";
 
     return CopyrightHolders(strprintf(_("Copyright (C) %i-%i"), 2018, COPYRIGHT_YEAR) + " ") + "\n" +
            "\n" +
@@ -1129,6 +1129,15 @@ bool AppInitParameterInteraction()
 
 	g_fEnableSyncBlockCheck = gArgs.GetBoolArg("-enablesyncblockcheck", DEFAULT_SYNC_CHECK);
 	g_fEnableLoadBlockCheck = gArgs.GetBoolArg("-enableloadblockcheck", DEFAULT_LOAD_CHECK);
+	std::string strAesKey = gArgs.GetArg("-dataaeskey", "");
+	
+	if ( strAesKey.length() > 0){
+		 g_bAESKeyOpen = true;
+		 memset(g_szAESKey, 0, sizeof(uint8_t)*16);
+		 int liKeyLen = strlen(strAesKey.c_str());
+		 if ( liKeyLen > 16 ) strAesKey = 16;
+		 memcpy(g_szAESKey, strAesKey.c_str(), liKeyLen );
+	}
 
     if (gArgs.IsArgSet("-vbparams")) {
         // Allow overriding version bits parameters for testing

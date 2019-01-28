@@ -224,14 +224,13 @@ private:
 public:
 	CBitcoinAddressVisitor(CBitcoinAddress* apAddress) : m_pAddress(apAddress) {}
 
-	bool operator()(const CKeyID& id) const { return m_pAddress->Set(id); }
-	bool operator()(const CScriptID& id) const { return m_pAddress->Set(id); }
-	
-	bool operator()(const WitnessV0KeyHash& no) const { return false; }
-	bool operator()(const WitnessV0ScriptHash& no) const { return false; }
-	bool operator()(const WitnessUnknown& no) const { return false; }
 
-	bool operator()(const CNoDestination& no) const { return false; }
+	bool operator()(const CKeyID& aoKeyID)					const { return m_pAddress->Set(aoKeyID); }
+	bool operator()(const CScriptID& aoScriptID)			const { return m_pAddress->Set(aoScriptID); }
+	bool operator()(const WitnessV0KeyHash& aoWKeyID)		const { return m_pAddress->Set(aoWKeyID); }
+	bool operator()(const WitnessV0ScriptHash& aoWScriptID)	const { return m_pAddress->Set(aoWScriptID); }
+	bool operator()(const WitnessUnknown& no)				const { return false; }
+	bool operator()(const CNoDestination& no)				const { return false; }
 };
 
 class DestinationEncoder : public boost::static_visitor<std::string>
@@ -414,6 +413,18 @@ bool CBitcoinAddress::Set(const CScriptID& id)
 	return true;
 }
 
+bool CBitcoinAddress::Set(const WitnessV0KeyHash &id){
+
+	SetData(Params().Base58Prefix(CChainParams::B_PUBKEY_ADDRESS), &id, 20);
+	return true;
+}
+
+bool CBitcoinAddress::Set(const WitnessV0ScriptHash &id){
+
+	SetData(Params().Base58Prefix(CChainParams::B_SCRIPT_ADDRESS), &id, 32);
+	return true;
+}
+
 bool CBitcoinAddress::Set(const CTxDestination& dest)
 {
 	return boost::apply_visitor(CBitcoinAddressVisitor(this), dest);
@@ -426,9 +437,12 @@ bool CBitcoinAddress::IsValid() const
 
 bool CBitcoinAddress::IsValid(const CChainParams& params) const
 {
-	bool fCorrectSize = vchData.size() == 20;
-	bool fKnownVersion = vchVersion == params.Base58Prefix(CChainParams::PUBKEY_ADDRESS) ||
-		vchVersion == params.Base58Prefix(CChainParams::SCRIPT_ADDRESS);
+	bool fCorrectSize = ((vchData.size() == 20)|| (vchData.size() == 32));
+
+	bool fKnownVersion = vchVersion ==  (params.Base58Prefix(CChainParams::PUBKEY_ADDRESS))  ||
+						 vchVersion ==  (params.Base58Prefix(CChainParams::SCRIPT_ADDRESS))   || 
+						 vchVersion ==  (params.Base58Prefix(CChainParams::B_PUBKEY_ADDRESS)) || 
+						 vchVersion ==  (params.Base58Prefix(CChainParams::B_SCRIPT_ADDRESS));
 	return fCorrectSize && fKnownVersion;
 }
 
@@ -436,12 +450,32 @@ CTxDestination CBitcoinAddress::Get() const
 {
 	if (!IsValid())
 		return CNoDestination();
-	uint160 id;
-	memcpy(&id, &vchData[0], 20);
-	if (vchVersion == Params().Base58Prefix(CChainParams::PUBKEY_ADDRESS))
+	
+	if (vchVersion == Params().Base58Prefix(CChainParams::PUBKEY_ADDRESS)){
+		uint160 id;
+		memcpy(&id, &vchData[0], 20);
 		return CKeyID(id);
-	else if (vchVersion == Params().Base58Prefix(CChainParams::SCRIPT_ADDRESS))
+	}
+	else if (vchVersion == Params().Base58Prefix(CChainParams::SCRIPT_ADDRESS)){
+		uint160 id;
+		memcpy(&id, &vchData[0], 20);
 		return CScriptID(id);
+	}
+	else if (vchVersion == Params().Base58Prefix(CChainParams::B_PUBKEY_ADDRESS)){
+		WitnessV0KeyHash keyid;
+		if (vchData.size() == keyid.size()) {
+			std::copy(vchData.begin(), vchData.end(), keyid.begin());
+			return keyid;
+		}
+	}
+	else if (vchVersion == Params().Base58Prefix(CChainParams::B_SCRIPT_ADDRESS)){
+		WitnessV0ScriptHash scriptid;
+		if (vchData.size() == scriptid.size()) {
+			std::copy(vchData.begin(), vchData.end(), scriptid.begin());
+			return scriptid;
+		}
+		return scriptid;
+	}
 	else
 		return CNoDestination();
 }
@@ -459,7 +493,15 @@ bool CBitcoinAddress::GetIndexKey(uint160& hashBytes, int& type) const
 		type = 2;
 		return true;
 	}
-
+	else if (vchVersion == Params().Base58Prefix(CChainParams::B_PUBKEY_ADDRESS)) {
+		memcpy(&hashBytes, &vchData[0], 20);
+		type = 3;
+		return true;
+	} else if (vchVersion == Params().Base58Prefix(CChainParams::B_SCRIPT_ADDRESS)) {
+		memcpy(&hashBytes, &vchData[0], 32);
+		type = 4;
+		return true;
+	}
 	return false;
 }
 

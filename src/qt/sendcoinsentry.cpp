@@ -21,6 +21,7 @@ SendCoinsEntry::SendCoinsEntry(const PlatformStyle *_platformStyle, QWidget *par
     platformStyle(_platformStyle)
 {
     ui->setupUi(this);
+	m_bHaveData = true;
 
     ui->addressBookButton->setIcon(platformStyle->SingleColorIcon(":/icons/address-book"));
     ui->pasteButton->setIcon(platformStyle->SingleColorIcon(":/icons/editpaste"));
@@ -250,7 +251,8 @@ void SendCoinsEntry::setAmount(const CAmount &amount)
 
 void SendCoinsEntry::setData(const QString &data)
 {
-	ui->addAsData->setText(data);
+	if (m_bHaveData)
+		ui->addAsData->setText(data);
 }
 
 bool SendCoinsEntry::isClear()
@@ -261,6 +263,24 @@ bool SendCoinsEntry::isClear()
 void SendCoinsEntry::setFocus()
 {
     ui->payTo->setFocus();
+}
+
+void SendCoinsEntry::ShowData(bool abIsShow){
+	if (abIsShow )
+	{
+		m_bHaveData = true;
+		ui->labellData->setEnabled(true);
+		ui->labellData->show();
+		ui->addAsData->setEnabled(true);
+		ui->addAsData->show();
+	}
+	else{
+		m_bHaveData = false;
+		ui->labellData->setEnabled(false);
+		ui->labellData->hide();
+		ui->addAsData->setEnabled(false);
+		ui->addAsData->hide();
+	}
 }
 
 void SendCoinsEntry::updateDisplayUnit()

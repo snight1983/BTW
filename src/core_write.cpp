@@ -135,7 +135,7 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     std::vector<CTxDestination> addresses;
     int nRequired;
 	std::string lstrAms = ScriptToAsmStr(scriptPubKey);
-    out.pushKV("asm", lstrAms);
+   
  	if ( lstrAms.length() > 10) {
  		const char* lpData = lstrAms.c_str();
  		if ( (lpData[0] == 'O') && (lpData[1] == 'P') &&  (lpData[3] == 'R') && (lpData[4] == 'E') && 
@@ -146,17 +146,22 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
 				 size_t loOut;
 				 char* lpData = (char*)tinfl_decompress_mem_to_heap( (const void *)&data[0],  data.size(), &loOut,  TINFL_FLAG_PARSE_ZLIB_HEADER);
 				 if (lpData){
-					 lstrData = lpData;
+
+					 char* lpRes = new char[loOut+1];
+					 memset(lpRes, 0, sizeof(char)*loOut+1);
+					 memcpy(lpRes, lpData, loOut);
+					 lstrData = lpRes;
 					 mz_free(lpData);
 					 int liLen = lstrData.length();
 					 if ( liLen > 0){
 						 out.pushKV("data", lstrData);
 					 }
+					 delete lpRes;
 				 }
  			}
  		}
  	}
-
+	 out.pushKV("asm", lstrAms);
 	if (fIncludeHex)
 		out.pushKV("hex", HexStr(scriptPubKey.begin(), scriptPubKey.end()));
 
