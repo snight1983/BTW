@@ -22,8 +22,6 @@ type sMiner struct {
 	bIschange     bool
 }
 
-var gMinerRetMap *sSyncMap
-
 type sAddressPay struct {
 	n64Dbid       int64
 	sUserAddress  string
@@ -39,8 +37,6 @@ type sAddressPayMap struct {
 	bIsUpdate bool
 	bIsInsert bool
 }
-
-var gAddrPayInfoMap *sSyncMap
 
 type sJobUDPData struct {
 	nLen   int
@@ -76,3 +72,5 @@ var gWorkHeader sBlockHeader
 var gMkrQueue *syncQueue
 var gShareQueue *syncQueue
 var gShareMap *sSyncMap
+var gAddrPayInfoMap *sSyncMap
+var gMinerRetMap *sSyncMap

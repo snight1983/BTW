@@ -2,18 +2,22 @@ package bitcoinvipsvr
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"time"
 )
 
 var gMsgcnt uint64
-var gJobUDPChannel = make(chan sJobUDPData, 1024)
+var gJobUDPChannel = make(chan sJobUDPData, 2048)
 
 func jobUDPHandle(id int) {
 	for {
 		ljob := <-gJobUDPChannel
 		gMsgcnt++
+		//if gMsgcnt%1024 == 0 {
+		//	now := time.Now()
+		//	fmt.Printf("%d-%d-%d %d:%d:%d|", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+		//	fmt.Printf("Pool:PackageCnt:%d \n", gMsgcnt)
+		//}
 		res, lMsgid := readInt32(ljob.byData, 0, ljob.nLen)
 		if true == res {
 			switch lMsgid {
@@ -36,7 +40,7 @@ func jobUDPHandle(id int) {
 				break
 			}
 		}
-	}
+	} //end for
 }
 
 func svrLsn() bool {
@@ -76,18 +80,20 @@ func svrLsn() bool {
 
 // StartSvr start udp lsn
 func StartSvr() bool {
-	{
-		rpcClient, err := newClient("127.0.0.1", 8337, "Bitcoinvip", "Bitcoinvippw", false)
-		if nil == err {
-			reqJSON := "{\"method\":\"listunspent\",\"params\":[]}"
-			retJSON, err2 := rpcClient.send(reqJSON)
-			if err2 != nil || nil == retJSON {
-				log.Fatalln(err2)
+	/*
+		{
+			rpcClient, err := newClient("127.0.0.1", 8337, "Bitcoinvip", "Bitcoinvippw", false)
+			if nil == err {
+				reqJSON := "{\"method\":\"listunspent\",\"params\":[]}"
+				retJSON, err2 := rpcClient.send(reqJSON)
+				if err2 != nil || nil == retJSON {
+					log.Fatalln(err2)
+				}
 			}
 		}
-	}
-
+	*/
 	gMinerRetMap = newSyncMap()
+	gShareMap = newSyncMap()
 	gAddrPayInfoMap = newSyncMap()
 	gMkrQueue = newQueue()
 	err := onInitDbConnectPool()
@@ -151,20 +157,23 @@ func StartSvr() bool {
 
 		if (tmCur - tmIncomeCheck) > 120 {
 			tmIncomeCheck = tmCur
+
 			fmt.Println("Income Check beg")
 			start := time.Now()
-			{
-				rpcClient, err := newClient("127.0.0.1", 8337, "Bitcoinvip", "Bitcoinvippw", false)
-				if nil == err {
-					reqJSON := "{\"method\":\"listunspent\",\"params\":[]}"
-					retJSON, err2 := rpcClient.send(reqJSON)
-					if err2 != nil {
-						log.Fatalln(err2)
+			/*
+				{
+					rpcClient, err := newClient("127.0.0.1", 8337, "Bitcoinvip", "Bitcoinvippw", false)
+					if nil == err {
+						reqJSON := "{\"method\":\"listunspent\",\"params\":[]}"
+						retJSON, err2 := rpcClient.send(reqJSON)
+						if err2 != nil {
+							log.Fatalln(err2)
+						}
+						log.Println("returnJson:", retJSON)
 					}
-					log.Println("returnJson:", retJSON)
-				}
 
-			}
+				}
+			*/
 			end := time.Now()
 			fmt.Println("insertShare total time:", end.Sub(start).Seconds())
 		}

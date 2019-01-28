@@ -1,9 +1,14 @@
 package bitcoinvipsvr
 
-import "net"
+import (
+	"fmt"
+	"net"
+	"time"
+)
 
 func msgHeaderID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int, datalen int) {
-	if datalen != 52 {
+
+	if datalen != 48 {
 		return
 	}
 	res, nVersion := readInt32(data, posbeg, datalen)
@@ -17,20 +22,28 @@ func msgHeaderID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int
 	}
 	posbeg += 4
 	if nHeight != gWorkHeader.nHeight {
-		gHeader = make([]byte, 48)
-		copy(gHeader[0:48], data[4:52])
-	}
-	gWorkHeader.nVersion = nVersion
-	gWorkHeader.nHeight = nHeight
+		gHeader = make([]byte, 44)
+		copy(gHeader[0:44], data[4:48])
+		gMkrQueue.Clear()
+		gWorkHeader.nVersion = nVersion
+		gWorkHeader.nHeight = nHeight
+		copy(gWorkHeader.byhashPervBlock[0:32], data[posbeg:posbeg+32])
+		posbeg += 32
+		res, gWorkHeader.nBitsBlock = readUInt32(data, posbeg, datalen)
+		posbeg += 4
 
-	copy(gWorkHeader.byhashPervBlock[0:32], data[posbeg:posbeg+32])
-	posbeg += 32
-	res, gWorkHeader.nBitsBlock = readUInt32(data, posbeg, datalen)
-	// back?
+		now := time.Now()
+		fmt.Printf("%d-%d-%d %d:%d:%d|", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+		fmt.Printf("Pool: New Header v:%d h:%d b:%d\n", gWorkHeader.nVersion, gWorkHeader.nHeight, gWorkHeader.nBitsBlock)
+		return
+	}
+	now := time.Now()
+	fmt.Printf("%d-%d-%d %d:%d:%d|", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
+	fmt.Printf("Pool: Old Header v:%d h:%d b:%d\n", gWorkHeader.nVersion, gWorkHeader.nHeight, gWorkHeader.nBitsBlock)
 }
 
 func msgMrkID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int, datalen int) {
-	if datalen != 1234 {
+	if datalen != 1234 || gMkrQueue.size() >= 4096 {
 		return
 	}
 	res, nHeight := readInt32(data, posbeg, datalen)

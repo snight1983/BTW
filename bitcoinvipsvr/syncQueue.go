@@ -36,7 +36,8 @@ func (q *syncQueue) Clear() bool {
 	}
 	q.lock.Lock()
 	defer q.lock.Unlock()
-	for i := 0; i < q.size(); i++ {
+	len := len(q.element)
+	for i := 0; i < len; i++ {
 		q.element[i] = nil
 	}
 	q.element = nil
