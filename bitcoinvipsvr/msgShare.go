@@ -1,20 +1,22 @@
 package bitcoinvipsvr
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"net"
+	"time"
 )
 
-func msgShareReportID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int, datalen int) {
+func msgShareReportRQ(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int, datalen int) {
 	buf := make([]byte, 32)
-	copy(buf[0:32], data[posbeg:posbeg+32])
-	posbeg += 32
-
-	if posbeg <= datalen {
+	posend := posbeg + 32
+	if posend >= datalen {
 		return
 	}
-
+	copy(buf[0:32], data[posbeg:posend])
+	posbeg = posend
 	hexHash := hex.EncodeToString(buf)
 	share := gShareMap.Get(hexHash)
 	if nil == share {
@@ -23,62 +25,162 @@ func msgShareReportID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbe
 		share.byhashMerkleRoot = make([]byte, 32)
 		share.byhashSeed = make([]byte, 32)
 		share.sHexShare = hexHash
-
 		res, nVersion := readInt32(data, posbeg, datalen)
-		if res == false {
+		posbeg += 4
+		if false == res || posbeg > datalen {
 			return
 		}
 		share.nVersion = nVersion
-		posbeg += 4
 
 		res, nHeight := readInt32(data, posbeg, datalen)
-		if res == false || nHeight != gWorkHeader.nHeight {
+		posbeg += 4
+		if (posbeg > datalen) || (false == res) || (nHeight != gWorkHeader.nHeight) {
 			return
 		}
 		share.nHeight = nHeight
-		posbeg += 4
-		posend := posbeg + 32
-
+		posend = posbeg + 32
+		if posend > datalen {
+			return
+		}
 		copy(share.byhashPervBlock[0:32], data[posbeg:posend])
 		posbeg = posend
 		posend += 32
+
 		if posend > datalen {
 			return
 		}
 		copy(share.byhashSeed[0:32], data[posbeg:posend])
 		posbeg = posend
-		res, share.nNonceLock = readUInt32(data, posbeg, datalen)
-		if res == false {
-			return
-		}
-		posbeg += 4
-		res, share.nNonceBlock = readUInt32(data, posbeg, datalen)
-		if res == false {
-			return
-		}
-		posbeg += 4
 		res, share.nNonceMrk = readUInt32(data, posbeg, datalen)
-		if res == false {
+		posbeg += 4
+
+		if false == res || posbeg > datalen {
 			return
 		}
+		posend = posbeg + 32
+
+		if posend > datalen {
+			return
+		}
+		copy(share.byhashMerkleRoot[0:32], data[posbeg:posend])
+		posbeg = posend
+
+		res, share.nTime = readUInt32(data, posbeg, datalen)
 		posbeg += 4
+		if false == res || posbeg > datalen {
+			return
+		}
+
+		res, share.nBit = readUInt32(data, posbeg, datalen)
+		posbeg += 4
+		if res == false || posbeg > datalen {
+			return
+		}
+
+		res, share.nNonceLock = readUInt32(data, posbeg, datalen)
+		posbeg += 4
+		if res == false || posbeg > datalen {
+			return
+		}
+
+		res, share.nNonceBlock = readUInt32(data, posbeg, datalen)
+		posbeg += 4
+		if false == res || posbeg > datalen {
+			return
+		}
+
+		res, share.nType = readUInt32(data, posbeg, datalen)
+		posbeg += 4
+		if false == res || posbeg > datalen {
+			return
+		}
 
 		share.sRecvAddress, posbeg, res = readString(data, posbeg, datalen)
 		if res == false {
 			return
 		}
-		res, nBit := readUInt32(data, posbeg, datalen)
-		if res == false {
-			return
-		}
-		if nBit >= gWorkHeader.nBitsBlock {
-			///////////////////////////////////////////
-			// br
+
+		if share.nType == 1 {
+			fmt.Printf("%s | Pool: Block:%s\n", time.Now().Format("2006-01-02 15:04:05"), hexHash)
+			msgSendBuffer := make([]byte, 0)
+			buf := bytes.NewBuffer([]byte{})
+
+			binary.Write(buf, binary.LittleEndian, gMsgShareRQ)
+			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+
+			binary.Write(buf, binary.LittleEndian, share.nNonceMrk)
+			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+
+			msgSendBuffer = append(msgSendBuffer, share.byhashMerkleRoot...)
+			msgSendBuffer = append(msgSendBuffer, share.byhashSeed...)
+
+			binary.Write(buf, binary.LittleEndian, share.nTime)
+			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+
+			binary.Write(buf, binary.LittleEndian, share.nNonceLock)
+			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+
+			binary.Write(buf, binary.LittleEndian, share.nNonceBlock)
+			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+
+			conn, err := net.Dial("udp", gPoolBlockIP)
+			defer conn.Close()
+			if err == nil {
+				//conn.Write(msgSendBuffer)
+			}
 		}
 		share.sHexShare = hexHash
 		share.nConfCnt = 0
+		fmt.Printf("%s | Pool: Share:%s\n", time.Now().Format("2006-01-02 15:04:05"), hexHash)
 		gShareMap.Set(hexHash, share)
 		gShareQueue.Push(share)
+	}
+	byMsgSendBuffer := make([]byte, 0)
+	byMsgID := bytes.NewBuffer([]byte{})
+	binary.Write(byMsgID, binary.LittleEndian, gMsgShareCheckRQ)
+	byMsgSendBuffer = append(byMsgSendBuffer, byMsgID.Bytes()...)
+	pConn.WriteToUDP(byMsgSendBuffer, paddr)
+}
+
+func msgShareCheckRQ(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int, datalen int) {
+	share := gShareQueue.Pop()
+	if nil != share {
+
+		msgSendBuffer := make([]byte, 0)
+		byMsgID := bytes.NewBuffer([]byte{})
+
+		binary.Write(byMsgID, binary.LittleEndian, gMsgShareCheckRS)
+		msgSendBuffer = append(msgSendBuffer, byMsgID.Bytes()...)
+
+		byVersion := bytes.NewBuffer([]byte{})
+		binary.Write(byVersion, binary.LittleEndian, share.(sShareData).nVersion)
+		msgSendBuffer = append(msgSendBuffer, byVersion.Bytes()...)
+
+		bHeight := bytes.NewBuffer([]byte{})
+		binary.Write(bHeight, binary.LittleEndian, share.(sShareData).nHeight)
+		msgSendBuffer = append(msgSendBuffer, bHeight.Bytes()...)
+
+		bynNonceLock := bytes.NewBuffer([]byte{})
+		binary.Write(bynNonceLock, binary.LittleEndian, share.(sShareData).nNonceLock)
+		msgSendBuffer = append(msgSendBuffer, bynNonceLock.Bytes()...)
+
+		bynNonceBlock := bytes.NewBuffer([]byte{})
+		binary.Write(bynNonceBlock, binary.LittleEndian, share.(sShareData).nNonceBlock)
+		msgSendBuffer = append(msgSendBuffer, bynNonceBlock.Bytes()...)
+
+		bynTime := bytes.NewBuffer([]byte{})
+		binary.Write(bynTime, binary.LittleEndian, share.(sShareData).nTime)
+		msgSendBuffer = append(msgSendBuffer, bynTime.Bytes()...)
+
+		bynBit := bytes.NewBuffer([]byte{})
+		binary.Write(bynBit, binary.LittleEndian, share.(sShareData).nBit)
+		msgSendBuffer = append(msgSendBuffer, bynBit.Bytes()...)
+
+		msgSendBuffer = append(msgSendBuffer, share.(sShareData).byhashPervBlock...)
+		msgSendBuffer = append(msgSendBuffer, share.(sShareData).byhashMerkleRoot...)
+		msgSendBuffer = append(msgSendBuffer, share.(sShareData).byhashSeed...)
+
+		pConn.WriteToUDP(msgSendBuffer, paddr)
 	}
 }
 

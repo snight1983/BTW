@@ -6,18 +6,9 @@ import (
 	"time"
 )
 
-var gMsgcnt uint64
-var gJobUDPChannel = make(chan sJobUDPData, 2048)
-
 func jobUDPHandle(id int) {
 	for {
 		ljob := <-gJobUDPChannel
-		gMsgcnt++
-		//if gMsgcnt%1024 == 0 {
-		//	now := time.Now()
-		//	fmt.Printf("%d-%d-%d %d:%d:%d|", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
-		//	fmt.Printf("Pool:PackageCnt:%d \n", gMsgcnt)
-		//}
 		res, lMsgid := readInt32(ljob.byData, 0, ljob.nLen)
 		if true == res {
 			switch lMsgid {
@@ -27,14 +18,20 @@ func jobUDPHandle(id int) {
 			case gMsgMiningWorkRQ:
 				msgMiningWorkRQ(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
 				break
-			case gMsgCheckWorkRQ:
-				msgCheckWorkRQ(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
+			case gMsgShareCheckRQ:
+				msgShareCheckRQ(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
 				break
 			case gMsgMrkID:
 				msgMrkID(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
 				break
 			case gHeaderMrkID:
 				msgHeaderID(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
+				break
+			case gMsgShareRQ:
+				msgShareReportRQ(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
+				break
+			case gMsgShareCheckID:
+				msgShareCheckID(ljob.pConn, ljob.pAddr, ljob.byData, 4, ljob.nLen)
 				break
 			default:
 				break
@@ -44,8 +41,7 @@ func jobUDPHandle(id int) {
 }
 
 func svrLsn() bool {
-	gMsgcnt = 0
-	addr, err := net.ResolveUDPAddr("udp", "127.0.0.1:10008")
+	addr, err := net.ResolveUDPAddr("udp", ":10008")
 	if err != nil {
 		fmt.Print(err)
 		return false
@@ -57,7 +53,7 @@ func svrLsn() bool {
 	}
 	defer listener.Close()
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 1; i++ {
 		go jobUDPHandle(i)
 	}
 
@@ -80,6 +76,10 @@ func svrLsn() bool {
 
 // StartSvr start udp lsn
 func StartSvr() bool {
+
+	gPoolBlockIP = "127.0.0.1:10009"
+	gnShareBit = 520159231 //about 65536 hash
+
 	/*
 		{
 			rpcClient, err := newClient("127.0.0.1", 8337, "Bitcoinvip", "Bitcoinvippw", false)
@@ -96,6 +96,7 @@ func StartSvr() bool {
 	gShareMap = newSyncMap()
 	gAddrPayInfoMap = newSyncMap()
 	gMkrQueue = newQueue()
+	gShareQueue = newQueue()
 	err := onInitDbConnectPool()
 	if err != nil {
 		fmt.Print(err)
@@ -109,38 +110,38 @@ func StartSvr() bool {
 	go svrLsn()
 
 	tmCheckRetUpdate := time.Now().Unix()
-	tmCheckRetInsert := tmCheckRetUpdate
+	//tmCheckRetInsert := tmCheckRetUpdate
 	tmCheckShare := tmCheckRetUpdate
 	tmIncomeCheck := tmCheckRetUpdate
 
 	for {
 		tmCur := time.Now().Unix()
-		if (tmCur-tmCheckRetInsert) > 120 && gMinerRetMap.isInsert {
-			fmt.Println("insertMinerRegedit beg")
-			tmCheckRetInsert = tmCur
-			gMinerRetMap.isInsert = false
-			start := time.Now()
-			insertMinerRegedit()
-			end := time.Now()
-			fmt.Println("insertMinerRegedit total time:", end.Sub(start).Seconds())
-		}
+		/*
+			if (tmCur-tmCheckRetInsert) > 120 && gMinerRetMap.isInsert {
+				fmt.Println("insertMinerRegedit beg")
+				tmCheckRetInsert = tmCur
+				gMinerRetMap.isInsert = false
+				start := time.Now()
+				insertMinerRegedit()
+				end := time.Now()
+				fmt.Println("insertMinerRegedit total time:", end.Sub(start).Seconds())
+			}
 
-		if (tmCur-tmCheckRetUpdate) > 120 && gMinerRetMap.isUpdate {
-			tmCheckRetUpdate = tmCur
-			fmt.Println("updateMinerRegedit beg")
-			gMinerRetMap.isUpdate = false
-			start := time.Now()
-			updateMinerRegedit()
-			end := time.Now()
-			fmt.Println("updateMinerRegedit total time:", end.Sub(start).Seconds())
-		}
-
+			if (tmCur-tmCheckRetUpdate) > 120 && gMinerRetMap.isUpdate {
+				tmCheckRetUpdate = tmCur
+				fmt.Println("updateMinerRegedit beg")
+				gMinerRetMap.isUpdate = false
+				start := time.Now()
+				updateMinerRegedit()
+				end := time.Now()
+				fmt.Println("updateMinerRegedit total time:", end.Sub(start).Seconds())
+			}
+		*/
 		if (tmCur - tmCheckShare) > 120 {
 			tmCheckShare = tmCur
 			fmt.Println("insertShare beg")
 			start := time.Now()
 			gShareMap.lock.RLock()
-			defer gShareMap.lock.RUnlock()
 			for key, value := range gShareMap.bm {
 				if value.(*sShareData).nConfCnt >= 3 {
 					insertShare(value.(*sShareData))
@@ -151,6 +152,7 @@ func StartSvr() bool {
 					gShareQueue.Push(value)
 				}
 			}
+			gShareMap.lock.RUnlock()
 			end := time.Now()
 			fmt.Println("insertShare total time:", end.Sub(start).Seconds())
 		}
@@ -175,7 +177,7 @@ func StartSvr() bool {
 				}
 			*/
 			end := time.Now()
-			fmt.Println("insertShare total time:", end.Sub(start).Seconds())
+			fmt.Println("Income total time:", end.Sub(start).Seconds())
 		}
 
 		time.Sleep(10 * time.Second)

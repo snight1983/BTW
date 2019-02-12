@@ -32,14 +32,19 @@ func msgHeaderID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int
 		res, gWorkHeader.nBitsBlock = readUInt32(data, posbeg, datalen)
 		posbeg += 4
 
-		now := time.Now()
-		fmt.Printf("%d-%d-%d %d:%d:%d|", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
-		fmt.Printf("Pool: New Header v:%d h:%d b:%d\n", gWorkHeader.nVersion, gWorkHeader.nHeight, gWorkHeader.nBitsBlock)
+		fmt.Printf("%s | Pool: New Header v:%d h:%d b:%d\n", time.Now().Format("2006-01-02 15:04:05"), gWorkHeader.nVersion, gWorkHeader.nHeight, gWorkHeader.nBitsBlock)
+		//gWorkHeader.nBitsShare = 520159231
+		/*
+			"0000:": 520159231,
+			"00000:": 504365055,
+			"000000:": 503382015,
+			"0000000:": 487587839,
+			"00000000:": 486604799,
+			"000000000:": 470810623
+		*/
 		return
 	}
-	now := time.Now()
-	fmt.Printf("%d-%d-%d %d:%d:%d|", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second())
-	fmt.Printf("Pool: Old Header v:%d h:%d b:%d\n", gWorkHeader.nVersion, gWorkHeader.nHeight, gWorkHeader.nBitsBlock)
+	//fmt.Printf("%s | Pool: Old Header v:%d h:%d b:%d\n", time.Now().Format("2006-01-02 15:04:05"), gWorkHeader.nVersion, gWorkHeader.nHeight, gWorkHeader.nBitsBlock)
 }
 
 func msgMrkID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int, datalen int) {
