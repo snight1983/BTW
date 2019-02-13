@@ -143,13 +143,16 @@ func StartSvr() bool {
 			start := time.Now()
 			gShareMap.lock.RLock()
 			for key, value := range gShareMap.bm {
-				if value.(*sShareData).nConfCnt >= 3 {
-					insertShare(value.(*sShareData))
-					delete(gShareMap.bm, key)
-				} else if value.(*sShareData).nHeight < gWorkHeader.nHeight-6 {
-					delete(gShareMap.bm, key)
-				} else {
-					gShareQueue.Push(value)
+				if nil != value {
+					if value.(*sShareData).nConfCnt >= 3 {
+						insertShare(value.(*sShareData))
+						delete(gShareMap.bm, key)
+					} else if value.(*sShareData).nHeight < gWorkHeader.nHeight-3 {
+						delete(gShareMap.bm, key)
+					} else {
+						gShareQueue.Push(value)
+						fmt.Printf("%s | Push Share Check:%s Height:%d\n", time.Now().Format("2006-01-02 15:04:05"), key, value.(*sShareData).nHeight)
+					}
 				}
 			}
 			gShareMap.lock.RUnlock()

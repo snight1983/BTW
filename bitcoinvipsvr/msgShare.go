@@ -101,40 +101,44 @@ func msgShareReportRQ(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbe
 		}
 
 		if share.nType == 1 {
-			fmt.Printf("%s | Pool: Block:%s\n", time.Now().Format("2006-01-02 15:04:05"), hexHash)
 			msgSendBuffer := make([]byte, 0)
-			buf := bytes.NewBuffer([]byte{})
 
-			binary.Write(buf, binary.LittleEndian, gMsgShareRQ)
-			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+			byMsgID := bytes.NewBuffer([]byte{})
+			binary.Write(byMsgID, binary.LittleEndian, gMsgShareRQ)
+			msgSendBuffer = append(msgSendBuffer, byMsgID.Bytes()...)
 
-			binary.Write(buf, binary.LittleEndian, share.nNonceMrk)
-			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+			byMrkNnoce := bytes.NewBuffer([]byte{})
+			binary.Write(byMrkNnoce, binary.LittleEndian, share.nNonceMrk)
+			msgSendBuffer = append(msgSendBuffer, byMrkNnoce.Bytes()...)
 
 			msgSendBuffer = append(msgSendBuffer, share.byhashMerkleRoot...)
 			msgSendBuffer = append(msgSendBuffer, share.byhashSeed...)
 
-			binary.Write(buf, binary.LittleEndian, share.nTime)
-			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+			byTime := bytes.NewBuffer([]byte{})
+			binary.Write(byTime, binary.LittleEndian, share.nTime)
+			msgSendBuffer = append(msgSendBuffer, byTime.Bytes()...)
 
-			binary.Write(buf, binary.LittleEndian, share.nNonceLock)
-			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+			byNonceLock := bytes.NewBuffer([]byte{})
+			binary.Write(byNonceLock, binary.LittleEndian, share.nNonceLock)
+			msgSendBuffer = append(msgSendBuffer, byNonceLock.Bytes()...)
 
-			binary.Write(buf, binary.LittleEndian, share.nNonceBlock)
-			msgSendBuffer = append(msgSendBuffer, buf.Bytes()...)
+			byNonceBlock := bytes.NewBuffer([]byte{})
+			binary.Write(byNonceBlock, binary.LittleEndian, share.nNonceBlock)
+			msgSendBuffer = append(msgSendBuffer, byNonceBlock.Bytes()...)
 
 			conn, err := net.Dial("udp", gPoolBlockIP)
 			defer conn.Close()
 			if err == nil {
-				//conn.Write(msgSendBuffer)
+				conn.Write(msgSendBuffer)
 			}
 		}
 		share.sHexShare = hexHash
 		share.nConfCnt = 0
-		fmt.Printf("%s | Pool: Share:%s\n", time.Now().Format("2006-01-02 15:04:05"), hexHash)
 		gShareMap.Set(hexHash, share)
+		fmt.Printf("%s | Pool: Push Share New:%s\n", time.Now().Format("2006-01-02 15:04:05"), hexHash)
 		gShareQueue.Push(share)
 	}
+
 	byMsgSendBuffer := make([]byte, 0)
 	byMsgID := bytes.NewBuffer([]byte{})
 	binary.Write(byMsgID, binary.LittleEndian, gMsgShareCheckRQ)
@@ -145,7 +149,7 @@ func msgShareReportRQ(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbe
 func msgShareCheckRQ(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg int, datalen int) {
 	share := gShareQueue.Pop()
 	if nil != share {
-
+		fmt.Printf("%s | Pool: msgShareCheckRQ QueueSize:%d\n", time.Now().Format("2006-01-02 15:04:05"), gShareQueue.size())
 		msgSendBuffer := make([]byte, 0)
 		byMsgID := bytes.NewBuffer([]byte{})
 
@@ -153,32 +157,32 @@ func msgShareCheckRQ(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg
 		msgSendBuffer = append(msgSendBuffer, byMsgID.Bytes()...)
 
 		byVersion := bytes.NewBuffer([]byte{})
-		binary.Write(byVersion, binary.LittleEndian, share.(sShareData).nVersion)
+		binary.Write(byVersion, binary.LittleEndian, share.(*sShareData).nVersion)
 		msgSendBuffer = append(msgSendBuffer, byVersion.Bytes()...)
 
 		bHeight := bytes.NewBuffer([]byte{})
-		binary.Write(bHeight, binary.LittleEndian, share.(sShareData).nHeight)
+		binary.Write(bHeight, binary.LittleEndian, share.(*sShareData).nHeight)
 		msgSendBuffer = append(msgSendBuffer, bHeight.Bytes()...)
 
 		bynNonceLock := bytes.NewBuffer([]byte{})
-		binary.Write(bynNonceLock, binary.LittleEndian, share.(sShareData).nNonceLock)
+		binary.Write(bynNonceLock, binary.LittleEndian, share.(*sShareData).nNonceLock)
 		msgSendBuffer = append(msgSendBuffer, bynNonceLock.Bytes()...)
 
 		bynNonceBlock := bytes.NewBuffer([]byte{})
-		binary.Write(bynNonceBlock, binary.LittleEndian, share.(sShareData).nNonceBlock)
+		binary.Write(bynNonceBlock, binary.LittleEndian, share.(*sShareData).nNonceBlock)
 		msgSendBuffer = append(msgSendBuffer, bynNonceBlock.Bytes()...)
 
 		bynTime := bytes.NewBuffer([]byte{})
-		binary.Write(bynTime, binary.LittleEndian, share.(sShareData).nTime)
+		binary.Write(bynTime, binary.LittleEndian, share.(*sShareData).nTime)
 		msgSendBuffer = append(msgSendBuffer, bynTime.Bytes()...)
 
 		bynBit := bytes.NewBuffer([]byte{})
-		binary.Write(bynBit, binary.LittleEndian, share.(sShareData).nBit)
+		binary.Write(bynBit, binary.LittleEndian, share.(*sShareData).nBit)
 		msgSendBuffer = append(msgSendBuffer, bynBit.Bytes()...)
 
-		msgSendBuffer = append(msgSendBuffer, share.(sShareData).byhashPervBlock...)
-		msgSendBuffer = append(msgSendBuffer, share.(sShareData).byhashMerkleRoot...)
-		msgSendBuffer = append(msgSendBuffer, share.(sShareData).byhashSeed...)
+		msgSendBuffer = append(msgSendBuffer, share.(*sShareData).byhashPervBlock...)
+		msgSendBuffer = append(msgSendBuffer, share.(*sShareData).byhashMerkleRoot...)
+		msgSendBuffer = append(msgSendBuffer, share.(*sShareData).byhashSeed...)
 
 		pConn.WriteToUDP(msgSendBuffer, paddr)
 	}
@@ -188,10 +192,11 @@ func msgShareCheckID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg
 	buf := make([]byte, 32)
 	copy(buf[0:32], data[posbeg:posbeg+32])
 	posbeg += 32
-	if posbeg <= datalen {
+	if posbeg >= datalen {
 		return
 	}
 	hexHash := hex.EncodeToString(buf)
+
 	share := gShareMap.Get(hexHash)
 	if nil != share {
 		res, nConf := readInt8(data, posbeg, datalen)
@@ -199,10 +204,12 @@ func msgShareCheckID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg
 			if 1 == nConf {
 				share.(*sShareData).nConfCnt++
 				if share.(*sShareData).nConfCnt < 3 {
+					fmt.Printf("%s | Pool: Push Share Old:%s\n", time.Now().Format("2006-01-02 15:04:05"), hexHash)
 					gShareQueue.Push(share)
 				}
 			} else {
 				gShareMap.Delete(hexHash)
+				fmt.Printf("%s | Pool: Bad CheckBlock:%s Cnt:%d\n", time.Now().Format("2006-01-02 15:04:05"), hexHash, share.(*sShareData).nConfCnt)
 			}
 		}
 	}
