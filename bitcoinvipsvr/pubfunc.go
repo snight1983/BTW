@@ -3,7 +3,19 @@ package bitcoinvipsvr
 import (
 	"bytes"
 	"encoding/binary"
+	"log"
+	"os"
+	"path/filepath"
 )
+
+// GetCurrentPath string
+func GetCurrentPath() (string, error) {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return dir, err
+}
 
 /*
 // CheckErr aaa
@@ -11,15 +23,6 @@ func CheckErr(err error) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-// GetCurrentPath aaa
-func GetCurrentPath() string {
-	s, err := exec.LookPath(os.Args[0])
-	CheckErr(err)
-	i := strings.LastIndex(s, "\\")
-	path := string(s[0 : i+1])
-	return path
 }
 
 // InitConfig InitConfig

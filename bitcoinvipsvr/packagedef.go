@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-const gMsgUserRegedit int32 = 1000
+//const gMsgUserRegedit int32 = 1000
 const gMsgMiningWorkRQ int32 = 1001
 const gMsgMiningWorkRS int32 = 1002
 const gMsgShareCheckRQ int32 = 1003
@@ -72,7 +72,51 @@ type sShareData struct {
 	nType            uint32
 }
 
-var gnShareBit uint32
+type sConfigJSON struct {
+	RPCIP           string `json:"RpcIp"`
+	RPCPORT         int    `json:"RpcPort"`
+	RPCUSER         string `json:"RpcUser"`
+	RPCPW           string `json:"RpcPw"`
+	POOLWALLETSYNC  string `json:"PoolWalletSync"`
+	POOLSHAREBIT    uint32 `json:"PoolShareBit"`
+	POOLSHAREHASH   int32  `json:"PoolShareHash"`
+	POOLMINPAY      int32  `json:"PoolMinPay"`
+	POOLPAYINTERVAL int64  `json:"PoolPayInterval"`
+	POOLPAYCALCULAT int64  `json:"PoolPayCalculat"`
+	POOLINCOME      int32  `json:"PoolIncome"`
+	POOLUDPLSN      string `json:"PoolUdpLsn"`
+	POOLRECVADDR    string `json:"PoolRecvAddress"`
+	POOLMINEADDR    string `json:"PoolMineAddress"`
+	DBNAME          string `json:"DBName"`
+	DBCONNECT       string `json:"DBConnect"`
+}
+
+type sDbBlocks struct {
+	n64Blockid  int64
+	sTxID       string
+	nu64Amount  uint64
+	n32IsHandle int
+}
+
+type sAddIncome struct {
+	nID           int64
+	sRecvaddress  string
+	nu64Unpay     uint64
+	nu64Paied     uint64
+	f32Speed      float32
+	n32Sharecur   int32
+	n32Sharetotal int32
+	nu64Createtm  int64
+	bIsInDB       bool
+}
+
+type sMinerShare struct {
+	nID       int64
+	sAddr     string
+	nIsHandle int
+}
+
+var gConfig *sConfigJSON
 var gHeader []byte
 var gWorkHeader sBlockHeader
 var gMkrQueue *syncQueue
@@ -80,5 +124,4 @@ var gShareQueue *syncQueue
 var gShareMap *sSyncMap
 var gAddrPayInfoMap *sSyncMap
 var gMinerRetMap *sSyncMap
-var gPoolBlockIP string
 var gJobUDPChannel = make(chan sJobUDPData, 2048)

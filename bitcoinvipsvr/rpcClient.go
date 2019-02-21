@@ -18,22 +18,6 @@ type rpcClient struct {
 	httpClient *http.Client
 }
 
-/*
-// 请求信息
-type rpcRequest struct {
-	Method  string      `json:"method"`
-	Params  interface{} `json:"params"`
-	ID      int64       `json:"id"`
-	JSONRpc string      `json:"jsonrpc"`
-}
-
-type rpcResponse struct {
-	ID     int64           `json:"id"`
-	Result json.RawMessage `json:"result"`
-	Err    interface{}     `json:"error"`
-}
-*/
-//连接配置
 func newClient(host string, port int, user, passwd string, useSSL bool) (c *rpcClient, err error) {
 	if len(host) == 0 {
 		err = errors.New("Bad call missing argument host")

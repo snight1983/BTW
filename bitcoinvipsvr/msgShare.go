@@ -126,7 +126,7 @@ func msgShareReportRQ(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbe
 			binary.Write(byNonceBlock, binary.LittleEndian, share.nNonceBlock)
 			msgSendBuffer = append(msgSendBuffer, byNonceBlock.Bytes()...)
 
-			conn, err := net.Dial("udp", gPoolBlockIP)
+			conn, err := net.Dial("udp", gConfig.POOLWALLETSYNC)
 			defer conn.Close()
 			if err == nil {
 				conn.Write(msgSendBuffer)
@@ -204,12 +204,10 @@ func msgShareCheckID(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg
 			if 1 == nConf {
 				share.(*sShareData).nConfCnt++
 				if share.(*sShareData).nConfCnt < 3 {
-					fmt.Printf("%s | Pool: Push Share Old:%s\n", time.Now().Format("2006-01-02 15:04:05"), hexHash)
 					gShareQueue.Push(share)
 				}
 			} else {
 				gShareMap.Delete(hexHash)
-				fmt.Printf("%s | Pool: Bad CheckBlock:%s Cnt:%d\n", time.Now().Format("2006-01-02 15:04:05"), hexHash, share.(*sShareData).nConfCnt)
 			}
 		}
 	}
@@ -228,4 +226,20 @@ func insertShare(share *sShareData) bool {
 		return false
 	}
 	return true
+}
+
+func insertBlock(txid string, amount int64) bool {
+	if nil != gDbconn {
+		stmt, err := gDbconn.Prepare("insert t_miner_block set txid=?,amount=?,finish=?;")
+		if err != nil {
+			return false
+		}
+		defer stmt.Close()
+		_, err = stmt.Exec(txid, amount, 0)
+		if err != nil {
+			return false
+		}
+		return true
+	}
+	return false
 }

@@ -26,7 +26,7 @@ func msgMiningWorkRQ(pConn *net.UDPConn, paddr *net.UDPAddr, data []byte, posbeg
 		msgSendBuffer = append(msgSendBuffer, msgID.Bytes()...)
 
 		shareBit := bytes.NewBuffer([]byte{})
-		binary.Write(shareBit, binary.LittleEndian, gnShareBit)
+		binary.Write(shareBit, binary.LittleEndian, gConfig.POOLSHAREBIT)
 		msgSendBuffer = append(msgSendBuffer, shareBit.Bytes()...)
 
 		msgSendBuffer = append(msgSendBuffer, gHeader...)
