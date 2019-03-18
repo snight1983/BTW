@@ -29,6 +29,6 @@ Development Process
 Translations
 ------------
 
-Demo
+LWallet
 ------------
-https://pan.baidu.com/s/1XDERcvpGMPCy8ae4utvFWQ
+https://vipool.ddou123.com/
