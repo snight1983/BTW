@@ -25,6 +25,8 @@ Development Process
 Translations
 ------------
 
-LWallet
+Link
 ------------
 https://vipool.ddou123.com/
+https://www.bitvip.org/
+https://explorer.bitvip.org/
